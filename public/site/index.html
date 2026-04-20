@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PAPPY Clothing — Born Above | Limited Edition Hoodie Pre-Order</title>
+  <meta name="description" content="Born Above. The debut limited-edition hoodie from PAPPY Clothing. 200 units worldwide. Pre-order now." />
+  <meta property="og:title" content="PAPPY Clothing — Born Above" />
+  <meta property="og:description" content="The debut hoodie. Limited to 200 units. Pre-order now." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="#top" class="nav__brand">PAPPY CLOTHING</a>
+    <nav class="nav__links">
+      <a href="#archive">Collection</a>
+      <a href="#hoodie">The Hoodie</a>
+      <a href="#manifesto">Our Story</a>
+      <a href="#footer">Contact</a>
+    </nav>
+    <div class="nav__right">
+      <a href="#preorder" class="btn btn--ghost-light">Pre-Order</a>
+      <button class="nav__cart" aria-label="Cart">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 6h18l-2 13H5L3 6Z"/><path d="M8 6a4 4 0 0 1 8 0"/></svg>
+      </button>
+    </div>
+    <button class="nav__burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="nav__mobile" id="navMobile">
+    <a href="#archive">Collection</a>
+    <a href="#hoodie">The Hoodie</a>
+    <a href="#manifesto">Our Story</a>
+    <a href="#footer">Contact</a>
+    <a href="#preorder" class="btn btn--ghost-light">Pre-Order</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="grain"></div>
+  <div class="hero__inner">
+    <div class="hero__text">
+      <p class="label fade" style="--d:120ms">Pappy Clothing Presents</p>
+      <h1 class="display">
+        <span class="fade" style="--d:240ms">BORN</span>
+        <span class="fade italic" style="--d:360ms">ABOVE</span>
+      </h1>
+      <div class="gold-line fade" style="--d:480ms"></div>
+      <p class="hero__sub fade" style="--d:600ms">The Debut Hoodie — Limited Pre-Order Now Open</p>
+      <div class="hero__cta fade" style="--d:720ms">
+        <a href="#preorder" class="btn btn--filled">Pre-Order Now</a>
+        <a href="#hoodie" class="btn btn--ghost-light">View The Drop</a>
+      </div>
+    </div>
+    <div class="hero__image fade" style="--d:300ms">
+      <div class="hero__glow"></div>
+      <img src="assets/pappy-hoodie.png" alt="PAPPY Born Above Hoodie" />
+    </div>
+  </div>
+  <div class="countdown" id="countdown">
+    <div><span class="cd-val" data-k="d">00</span><span class="cd-lbl">Days</span></div>
+    <div class="cd-sep"></div>
+    <div><span class="cd-val" data-k="h">00</span><span class="cd-lbl">Hrs</span></div>
+    <div class="cd-sep"></div>
+    <div><span class="cd-val" data-k="m">00</span><span class="cd-lbl">Min</span></div>
+    <div class="cd-sep"></div>
+    <div><span class="cd-val" data-k="s">00</span><span class="cd-lbl">Sec</span></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee">
+  <div class="marquee__track">
+    <span>BORN ABOVE · PAPPY CLOTHING · LIMITED EDITION · PRE-ORDER NOW · </span>
+    <span>BORN ABOVE · PAPPY CLOTHING · LIMITED EDITION · PRE-ORDER NOW · </span>
+    <span>BORN ABOVE · PAPPY CLOTHING · LIMITED EDITION · PRE-ORDER NOW · </span>
+    <span>BORN ABOVE · PAPPY CLOTHING · LIMITED EDITION · PRE-ORDER NOW · </span>
+  </div>
+</div>
+
+<!-- HOODIE -->
+<section class="hoodie reveal" id="hoodie">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="display dark">The <span class="italic">Born Above</span> Hoodie</h2>
+      <span class="label muted">Drop 001 / 2025</span>
+    </div>
+    <div class="hoodie__grid">
+      <div>
+        <div class="gallery" id="gallery">
+          <img class="gallery__img is-active" data-i="0" src="assets/pappy-hoodie.png" alt="front" />
+          <img class="gallery__img" data-i="1" src="assets/pappy-hoodie.png" alt="back" />
+          <img class="gallery__img" data-i="2" src="assets/pappy-hoodie.png" alt="detail" />
+        </div>
+        <div class="thumbs" id="thumbs">
+          <button class="thumb is-active" data-i="0"><img src="assets/pappy-hoodie.png" alt=""/></button>
+          <button class="thumb" data-i="1"><img src="assets/pappy-hoodie.png" alt=""/></button>
+          <button class="thumb" data-i="2"><img src="assets/pappy-hoodie.png" alt=""/></button>
+        </div>
+      </div>
+      <div>
+        <p class="label gold">Born Above — Drop 001</p>
+        <h3 class="display dark prod-title">The Heavyweight Hoodie</h3>
+        <p class="prod-desc">Premium heavyweight cotton, 500gsm, brushed interior. Embroidered logo, screen-printed back graphic. Limited to 200 units worldwide.</p>
+        <div class="price-block">
+          <div class="price">₦85,000</div>
+          <p class="label muted">Pre-order · Ships in 6–8 weeks</p>
+        </div>
+        <div class="picker">
+          <p class="label dark-label">Size</p>
+          <div class="sizes" id="sizes">
+            <button class="size" data-s="XS">XS</button>
+            <button class="size" data-s="S">S</button>
+            <button class="size is-active" data-s="M">M</button>
+            <button class="size" data-s="L">L</button>
+            <button class="size" data-s="XL">XL</button>
+            <button class="size" data-s="XXL">XXL</button>
+          </div>
+        </div>
+        <div class="picker">
+          <p class="label dark-label">Color · Black</p>
+          <div class="color-dot"></div>
+        </div>
+        <a href="#preorder" class="btn btn--cta">Pre-Order This Hoodie<span class="cta-line"></span></a>
+        <p class="label muted center" style="margin-top:1rem">✦ Only 200 units available worldwide</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PREORDER -->
+<section class="preorder reveal" id="preorder">
+  <div class="container">
+    <div class="section-head light">
+      <div>
+        <p class="label gold">Reserve Your Piece</p>
+        <h2 class="display">Secure Your <span class="italic">Unit</span></h2>
+      </div>
+    </div>
+    <div id="preorderWrap" class="preorder__grid">
+      <aside class="summary">
+        <p class="label muted-light">Order Summary</p>
+        <div class="summary__item">
+          <div class="summary__thumb"><img src="assets/pappy-hoodie.png" alt=""/></div>
+          <div>
+            <p class="summary__name">Born Above Hoodie</p>
+            <p class="label muted-light small">Size <span id="sumSize">M</span> · Qty 1</p>
+            <p class="label muted-light small">Black</p>
+          </div>
+        </div>
+        <div class="summary__rows">
+          <div><span class="label">Subtotal</span><span class="mono">₦85,000</span></div>
+          <div><span class="label">Shipping</span><span class="mono">₦5,000</span></div>
+        </div>
+        <div class="summary__total">
+          <span>Total</span><span>₦90,000</span>
+        </div>
+      </aside>
+
+      <form id="preorderForm" class="form">
+        <div class="form-block">
+          <p class="form-block__title">Customer</p>
+          <div class="grid-2">
+            <label><span>Full Name</span><input required type="text" /></label>
+            <label><span>Email Address</span><input required type="email" /></label>
+            <label><span>Phone Number</span><input required type="tel" /></label>
+          </div>
+        </div>
+        <div class="form-block">
+          <p class="form-block__title">Shipping</p>
+          <div class="grid-2">
+            <label class="full"><span>Street Address</span><input required type="text" /></label>
+            <label><span>City</span><input required type="text" /></label>
+            <label><span>State / Province</span><input required type="text" /></label>
+            <label><span>Country</span>
+              <select>
+                <option>Nigeria</option>
+                <option>United States</option>
+                <option>United Kingdom</option>
+                <option>Canada</option>
+                <option>Other</option>
+              </select>
+            </label>
+            <label><span>ZIP / Postal Code</span><input required type="text" /></label>
+          </div>
+        </div>
+        <div class="form-block">
+          <p class="form-block__title">Payment</p>
+          <div class="grid-2">
+            <label class="full"><span>Card Number</span><input required type="text" placeholder="1234 5678 9012 3456" /></label>
+            <label><span>Expiry</span><input required type="text" placeholder="MM / YY" /></label>
+            <label><span>CVV</span><input required type="text" placeholder="•••" /></label>
+            <label class="full"><span>Cardholder Name</span><input required type="text" /></label>
+          </div>
+        </div>
+        <button type="submit" class="btn btn--filled wide">Place Pre-Order</button>
+        <p class="label muted-light center small" style="margin-top:1rem">🔒 Secure checkout · Card charged only upon shipment confirmation</p>
+      </form>
+    </div>
+
+    <div id="preorderDone" class="preorder__done" hidden>
+      <div class="checkmark"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c9a84c" stroke-width="1.5"><path d="M5 12l5 5L20 7"/></svg></div>
+      <h2 class="display">Your unit is secured.</h2>
+      <p class="muted-light" style="margin:1.5rem 0 .5rem">Order reference</p>
+      <p class="mono ref" id="orderRef">PPY-XXXXXX</p>
+      <p class="label muted-light small" style="margin-top:2rem">A confirmation has been queued for your inbox.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CIRCLE -->
+<section class="circle reveal">
+  <div class="container narrow center">
+    <p class="label muted">Members</p>
+    <h2 class="display dark">Join the <span class="italic">Circle</span></h2>
+    <p class="circle__sub">First access to drops, exclusive pricing, and members-only releases.</p>
+    <form id="circleForm" class="circle__form">
+      <input required type="text" placeholder="First Name" />
+      <input required type="email" placeholder="Email Address" />
+      <input type="tel" placeholder="Phone (optional)" />
+      <button type="submit" class="btn btn--dark wide">Claim Your Spot</button>
+    </form>
+    <div id="circleDone" class="circle__done" hidden>
+      <div class="checkmark dark"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.5"><path d="M5 12l5 5L20 7"/></svg></div>
+      <p class="display dark" style="font-size:1.75rem">You're in. Welcome to the circle.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ARCHIVE -->
+<section class="archive reveal" id="archive">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <p class="label gold">The Collection</p>
+        <h2 class="display">The <span class="italic">Archive</span></h2>
+      </div>
+      <p class="muted-light archive__sub">More pieces. Same standard.</p>
+    </div>
+    <div class="archive__grid">
+      <a class="card" href="#">
+        <div class="card__img"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80&auto=format&fit=crop" alt="Classic Tee" /></div>
+        <div class="card__meta"><span>Classic Tee</span><span class="badge">Coming Soon</span></div>
+      </a>
+      <a class="card" href="#">
+        <div class="card__img"><img src="https://images.unsplash.com/photo-1552902865-b72c031ac5ea?w=800&q=80&auto=format&fit=crop" alt="Track Pants" /></div>
+        <div class="card__meta"><span>Track Pants</span><span class="badge">Coming Soon</span></div>
+      </a>
+      <a class="card" href="#">
+        <div class="card__img"><img src="https://images.unsplash.com/photo-1521369909029-2afed882baee?w=800&q=80&auto=format&fit=crop" alt="Structured Cap" /></div>
+        <div class="card__meta"><span>Structured Cap</span><span class="badge">Coming Soon</span></div>
+      </a>
+      <a class="card" href="#">
+        <div class="card__img"><img src="https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=800&q=80&auto=format&fit=crop" alt="Overcoat" /></div>
+        <div class="card__meta"><span>Overcoat</span><span class="badge">Coming Soon</span></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO -->
+<section class="manifesto reveal" id="manifesto">
+  <div class="container narrow center">
+    <p class="manifesto__quote">“Not for everyone. Built for those who were never average.”</p>
+    <div class="gold-line center-line"></div>
+    <p class="label muted">— Pappy Clothing, 2025</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="footer">
+  <div class="container">
+    <h3 class="footer__brand">PAPPY CLOTHING</h3>
+    <div class="footer__cols">
+      <div><p class="label gold">Shop</p><ul><li><a href="#hoodie">The Hoodie</a></li><li><a href="#archive">The Archive</a></li><li><a href="#preorder">Pre-Order</a></li></ul></div>
+      <div><p class="label gold">Help</p><ul><li><a href="#">Shipping Info</a></li><li><a href="#">Returns</a></li><li><a href="#">FAQ</a></li><li><a href="#">Contact Us</a></li></ul></div>
+      <div><p class="label gold">Legal</p><ul><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li></ul></div>
+      <div><p class="label gold">Connect</p><ul><li><a href="#">Instagram</a></li><li><a href="#">TikTok</a></li><li><a href="#">Twitter / X</a></li></ul></div>
+    </div>
+    <p class="footer__copy">© 2025 Pappy Clothing — Born Above.</p>
+  </div>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
