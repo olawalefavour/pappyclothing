@@ -45,7 +45,7 @@ function DashboardPage() {
       supabase.from("referral_codes").select("*"),
       supabase.from("profiles").select("full_name, phone").eq("id", user.id).single(),
     ]).then(([o, c, p]) => {
-      setOrders((o.data ?? []) as Order[]);
+      setOrders((o.data ?? []) as unknown as Order[]);
       setCodes((c.data ?? []) as ReferralCode[]);
       setProfile(p.data);
       setLoading(false);

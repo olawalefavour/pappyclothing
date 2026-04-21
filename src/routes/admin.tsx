@@ -284,7 +284,7 @@ function OrdersTab() {
   useEffect(() => {
     let q = supabase.from("orders").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter as "paid" | "pending" | "failed" | "cancelled");
-    q.then(({ data }) => setOrders((data ?? []) as AdminOrder[]));
+    q.then(({ data }) => setOrders((data ?? []) as unknown as AdminOrder[]));
   }, [filter]);
 
   return (
