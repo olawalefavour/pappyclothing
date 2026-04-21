@@ -82,7 +82,7 @@ function HomePage() {
       <section className="py-24 px-6 lg:px-12 fade-up bg-[oklch(0.04_0_0)]">
         <div className="max-w-[1600px] mx-auto grid md:grid-cols-2 gap-16 items-center">
           <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] flex items-center justify-center overflow-hidden">
-            <img src="/site/assets/pappy-hoodie.png" alt="BORN ABOVE Hoodie" className="w-full h-full object-cover" />
+            <img src="/assets/pappy-hoodie.png" alt="BORN ABOVE Hoodie" className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-6">Edition 01 / 200</div>

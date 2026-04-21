@@ -67,7 +67,7 @@ function ShopPage() {
       <div className="pt-24 px-6 lg:px-12 max-w-[1600px] mx-auto">
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 py-12">
           <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] overflow-hidden">
-            <img src={product.images[0] ?? "/site/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.images[0] ?? "/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
           </div>
 
           <div>
