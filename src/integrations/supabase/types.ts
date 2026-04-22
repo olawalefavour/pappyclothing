@@ -76,6 +76,7 @@ export type Database = {
       products: {
         Row: {
           active: boolean
+          archived: boolean
           colors: string[]
           created_at: string
           description: string | null
@@ -88,6 +89,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          archived?: boolean
           colors?: string[]
           created_at?: string
           description?: string | null
@@ -100,6 +102,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          archived?: boolean
           colors?: string[]
           created_at?: string
           description?: string | null
