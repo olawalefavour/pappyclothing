@@ -1,47 +1,39 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useCart, formatNaira } from "@/lib/cart";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
+import { getCatalogProducts, type CatalogProduct } from "@/lib/products.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/shop")({
+  loader: () => getCatalogProducts(),
   component: ShopPage,
 });
 
-interface Product {
-  id: string;
-  name: string;
-  description: string | null;
-  price_kobo: number;
-  colors: string[];
-  sizes: string[];
-  images: string[];
-}
-
 function ShopPage() {
-  const [product, setProduct] = useState<Product | null>(null);
+  const catalog = Route.useLoaderData() as CatalogProduct[];
+  const [product, setProduct] = useState<CatalogProduct | null>(null);
   const [color, setColor] = useState("");
   const [size, setSize] = useState("");
   const [qty, setQty] = useState(1);
   const { add } = useCart();
   const navigate = useNavigate();
+  const liveProducts = catalog.filter((item) => item.active);
+  const archiveProducts = catalog.filter((item) => item.archived);
 
   useEffect(() => {
-    supabase.from("products").select("*").eq("active", true).limit(1).single().then(({ data }) => {
-      if (data) {
-        setProduct(data as Product);
-        setColor(data.colors[0] ?? "");
-        setSize(data.sizes[0] ?? "");
-      }
-    });
-  }, []);
+    const firstLive = liveProducts[0] ?? null;
+    setProduct(firstLive);
+    setColor(firstLive?.colors[0] ?? "");
+    setSize(firstLive?.sizes[0] ?? "");
+    setQty(1);
+  }, [catalog]);
 
   if (!product) {
     return (
       <div className="min-h-screen">
         <SiteHeader />
-        <div className="pt-40 px-6 text-center text-sm text-muted-foreground tracking-wider">Loading…</div>
+        <div className="pt-40 px-6 text-center text-sm text-muted-foreground tracking-wider">No live products yet.</div>
       </div>
     );
   }
@@ -65,6 +57,32 @@ function ShopPage() {
     <div>
       <SiteHeader />
       <div className="pt-24 px-6 lg:px-12 max-w-[1600px] mx-auto">
+        {liveProducts.length > 1 && (
+          <section className="border-b border-border py-8">
+            <div className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Live Products</div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {liveProducts.map((item) => (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    setProduct(item);
+                    setColor(item.colors[0] ?? "");
+                    setSize(item.sizes[0] ?? "");
+                    setQty(1);
+                  }}
+                  className={`border p-4 text-left transition ${product.id === item.id ? "border-[var(--gold)]" : "border-border hover:border-foreground"}`}
+                >
+                  <div className="aspect-[4/5] bg-card overflow-hidden mb-4">
+                    <img src={item.images[0] ?? "/assets/pappy-hoodie.png"} alt={item.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div className="font-display text-2xl">{item.name}</div>
+                  <div className="font-mono text-sm mt-2">{formatNaira(item.price_kobo)}</div>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
         <div className="grid md:grid-cols-2 gap-12 lg:gap-20 py-12">
           <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] overflow-hidden">
             <img src={product.images[0] ?? "/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
@@ -125,6 +143,42 @@ function ShopPage() {
             </div>
           </div>
         </div>
+
+        <section id="archive" className="border-t border-border py-20">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
+            <div>
+              <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-3">Archive</div>
+              <h2 className="text-4xl md:text-5xl font-display">Previous drops</h2>
+            </div>
+            <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
+              Archived pieces stay visible for story and reference, while only live products can be added to cart.
+            </p>
+          </div>
+
+          {archiveProducts.length === 0 ? (
+            <div className="border border-border p-8 text-sm text-muted-foreground">No archived products yet.</div>
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              {archiveProducts.map((item) => (
+                <article key={item.id} className="border border-border">
+                  <div className="aspect-[4/5] bg-card overflow-hidden">
+                    <img src={item.images[0] ?? "/assets/pappy-hoodie.png"} alt={`${item.name} archived product`} className="w-full h-full object-cover opacity-85" />
+                  </div>
+                  <div className="p-6 space-y-3">
+                    <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Archived</div>
+                    <h3 className="text-3xl font-display">{item.name}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{item.description ?? "Limited edition piece from the Pappy Clothings archive."}</p>
+                    <div className="flex flex-wrap gap-2 text-[10px] tracking-[0.2em] uppercase text-muted-foreground">
+                      {item.sizes.map((value) => (
+                        <span key={value} className="border border-border px-3 py-2">{value}</span>
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
       </div>
       <SiteFooter />
     </div>
