@@ -65,7 +65,7 @@ function ShopPage() {
                     setSize(item.sizes[0] ?? "");
                     setQty(1);
                   }}
-                  className={`border p-4 text-left transition ${product.id === item.id ? "border-[var(--gold)]" : "border-border hover:border-foreground"}`}
+                  className={`border p-4 text-left transition ${product?.id === item.id ? "border-[var(--gold)]" : "border-border hover:border-foreground"}`}
                 >
                   <div className="aspect-[4/5] bg-card overflow-hidden mb-4">
                     <img src={item.images[0] ?? "/assets/pappy-hoodie.png"} alt={item.name} className="w-full h-full object-cover" />
