@@ -29,16 +29,11 @@ function ShopPage() {
     setQty(1);
   }, [catalog]);
 
-  if (!product) {
-    return (
-      <div className="min-h-screen">
-        <SiteHeader />
-        <div className="pt-40 px-6 text-center text-sm text-muted-foreground tracking-wider">No live products yet.</div>
-      </div>
-    );
-  }
-
   const handleAdd = (goCheckout: boolean) => {
+    if (!product) {
+      toast.error("No live product available right now");
+      return;
+    }
     if (!color || !size) { toast.error("Select color and size"); return; }
     add({
       product_id: product.id,
@@ -83,66 +78,74 @@ function ShopPage() {
           </section>
         )}
 
-        <div className="grid md:grid-cols-2 gap-12 lg:gap-20 py-12">
-          <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] overflow-hidden">
-            <img src={product.images[0] ?? "/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
+        {product ? (
+          <div className="grid md:grid-cols-2 gap-12 lg:gap-20 py-12">
+            <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] overflow-hidden">
+              <img src={product.images[0] ?? "/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
+            </div>
+
+            <div>
+              <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-4">Edition 01 / 200</div>
+              <h1 className="text-5xl md:text-6xl font-display mb-4">{product.name}</h1>
+              <div className="font-mono text-2xl mb-8">{formatNaira(product.price_kobo)}</div>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-10">{product.description}</p>
+
+              <div className="mb-8">
+                <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Color</div>
+                <div className="flex flex-wrap gap-2">
+                  {product.colors.map((c) => (
+                    <button
+                      key={c}
+                      onClick={() => setColor(c)}
+                      className={`px-4 py-2 border text-xs tracking-wider ${color === c ? "border-[var(--gold)] text-[var(--gold)]" : "border-border hover:border-foreground"}`}
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Size</div>
+                <div className="flex gap-2">
+                  {product.sizes.map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setSize(s)}
+                      className={`w-14 h-14 border text-sm font-mono ${size === s ? "border-[var(--gold)] text-[var(--gold)]" : "border-border hover:border-foreground"}`}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-10">
+                <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Quantity</div>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 border border-border hover:border-foreground">−</button>
+                  <span className="font-mono text-lg w-10 text-center">{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} className="w-10 h-10 border border-border hover:border-foreground">+</button>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button onClick={() => handleAdd(false)} className="flex-1 border border-foreground py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition">
+                  Add to Cart
+                </button>
+                <button onClick={() => handleAdd(true)} className="flex-1 bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition">
+                  Buy Now →
+                </button>
+              </div>
+            </div>
           </div>
-
-          <div>
-            <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-4">Edition 01 / 200</div>
-            <h1 className="text-5xl md:text-6xl font-display mb-4">{product.name}</h1>
-            <div className="font-mono text-2xl mb-8">{formatNaira(product.price_kobo)}</div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-10">{product.description}</p>
-
-            <div className="mb-8">
-              <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Color</div>
-              <div className="flex flex-wrap gap-2">
-                {product.colors.map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setColor(c)}
-                    className={`px-4 py-2 border text-xs tracking-wider ${color === c ? "border-[var(--gold)] text-[var(--gold)]" : "border-border hover:border-foreground"}`}
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Size</div>
-              <div className="flex gap-2">
-                {product.sizes.map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setSize(s)}
-                    className={`w-14 h-14 border text-sm font-mono ${size === s ? "border-[var(--gold)] text-[var(--gold)]" : "border-border hover:border-foreground"}`}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="mb-10">
-              <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Quantity</div>
-              <div className="flex items-center gap-3">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="w-10 h-10 border border-border hover:border-foreground">−</button>
-                <span className="font-mono text-lg w-10 text-center">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="w-10 h-10 border border-border hover:border-foreground">+</button>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button onClick={() => handleAdd(false)} className="flex-1 border border-foreground py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition">
-                Add to Cart
-              </button>
-              <button onClick={() => handleAdd(true)} className="flex-1 bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition">
-                Buy Now →
-              </button>
-            </div>
-          </div>
-        </div>
+        ) : (
+          <section className="py-20 text-center border-b border-border">
+            <div className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Shop</div>
+            <h1 className="text-4xl md:text-5xl font-display mb-4">No live products right now</h1>
+            <p className="text-sm text-muted-foreground max-w-xl mx-auto">You can still browse the archive below while new drops are being prepared.</p>
+          </section>
+        )}
 
         <section id="archive" className="border-t border-border py-20">
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-10">
