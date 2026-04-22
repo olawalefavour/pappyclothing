@@ -15,8 +15,6 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PaymentCallbackRouteImport } from './routes/payment.callback'
-import { Route as ApiPaystackWebhookRouteImport } from './routes/api.paystack.webhook'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
@@ -48,16 +46,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PaymentCallbackRoute = PaymentCallbackRouteImport.update({
-  id: '/payment/callback',
-  path: '/payment/callback',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPaystackWebhookRoute = ApiPaystackWebhookRouteImport.update({
-  id: '/api/paystack/webhook',
-  path: '/api/paystack/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -66,8 +54,6 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
-  '/payment/callback': typeof PaymentCallbackRoute
-  '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,8 +62,6 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
-  '/payment/callback': typeof PaymentCallbackRoute
-  '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,30 +71,12 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
-  '/payment/callback': typeof PaymentCallbackRoute
-  '/api/paystack/webhook': typeof ApiPaystackWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/admin'
-    | '/auth'
-    | '/checkout'
-    | '/dashboard'
-    | '/shop'
-    | '/payment/callback'
-    | '/api/paystack/webhook'
+  fullPaths: '/' | '/admin' | '/auth' | '/checkout' | '/dashboard' | '/shop'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/admin'
-    | '/auth'
-    | '/checkout'
-    | '/dashboard'
-    | '/shop'
-    | '/payment/callback'
-    | '/api/paystack/webhook'
+  to: '/' | '/admin' | '/auth' | '/checkout' | '/dashboard' | '/shop'
   id:
     | '__root__'
     | '/'
@@ -119,8 +85,6 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/dashboard'
     | '/shop'
-    | '/payment/callback'
-    | '/api/paystack/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,8 +94,6 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   DashboardRoute: typeof DashboardRoute
   ShopRoute: typeof ShopRoute
-  PaymentCallbackRoute: typeof PaymentCallbackRoute
-  ApiPaystackWebhookRoute: typeof ApiPaystackWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,20 +140,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/payment/callback': {
-      id: '/payment/callback'
-      path: '/payment/callback'
-      fullPath: '/payment/callback'
-      preLoaderRoute: typeof PaymentCallbackRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/paystack/webhook': {
-      id: '/api/paystack/webhook'
-      path: '/api/paystack/webhook'
-      fullPath: '/api/paystack/webhook'
-      preLoaderRoute: typeof ApiPaystackWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -202,8 +150,6 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   DashboardRoute: DashboardRoute,
   ShopRoute: ShopRoute,
-  PaymentCallbackRoute: PaymentCallbackRoute,
-  ApiPaystackWebhookRoute: ApiPaystackWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { formatNaira } from "@/lib/cart";
+import { updateOrderStatus } from "@/lib/paystack.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -280,18 +281,36 @@ function OrdersTab() {
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [open, setOpen] = useState<AdminOrder | null>(null);
+  const [updating, setUpdating] = useState(false);
 
-  useEffect(() => {
+  const load = () => {
     let q = supabase.from("orders").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter as "paid" | "pending" | "failed" | "cancelled");
     q.then(({ data }) => setOrders((data ?? []) as unknown as AdminOrder[]));
-  }, [filter]);
+  };
+
+  useEffect(() => { load(); }, [filter]);
+
+  const setStatus = async (status: "paid" | "cancelled" | "pending") => {
+    if (!open) return;
+    setUpdating(true);
+    try {
+      await updateOrderStatus({ data: { order_id: open.id, status } });
+      toast.success(status === "paid" ? "Marked as fulfilled" : status === "cancelled" ? "Order cancelled" : "Marked as pending");
+      setOpen({ ...open, status });
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to update order");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   return (
     <div>
-      <div className="flex gap-2 mb-6">
-        {["all", "paid", "pending", "failed"].map((f) => (
-          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 text-[10px] tracking-[0.3em] uppercase border ${filter === f ? "border-[var(--gold)] text-[var(--gold)]" : "border-border"}`}>{f}</button>
+      <div className="flex gap-2 mb-6 flex-wrap">
+        {["all", "pending", "paid", "cancelled", "failed"].map((f) => (
+          <button key={f} onClick={() => setFilter(f)} className={`px-4 py-2 text-[10px] tracking-[0.3em] uppercase border ${filter === f ? "border-[var(--gold)] text-[var(--gold)]" : "border-border"}`}>{f === "paid" ? "fulfilled" : f}</button>
         ))}
       </div>
       <div className="space-y-2">
@@ -300,16 +319,25 @@ function OrdersTab() {
             <div className="font-mono text-xs">{o.id.slice(0, 8).toUpperCase()}</div>
             <div className="text-xs text-muted-foreground">{new Date(o.created_at).toLocaleString()}</div>
             <div className="text-xs">{o.shipping_address?.full_name}</div>
-            <div className={`text-[10px] tracking-[0.3em] uppercase ${o.status === "paid" ? "text-[var(--gold)]" : o.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>{o.status}</div>
+            <div className={`text-[10px] tracking-[0.3em] uppercase ${o.status === "paid" ? "text-[var(--gold)]" : o.status === "cancelled" || o.status === "failed" ? "text-destructive" : "text-muted-foreground"}`}>{o.status === "paid" ? "fulfilled" : o.status}</div>
             <div className="font-mono text-right">{formatNaira(o.total_kobo)}</div>
           </button>
         ))}
+        {orders.length === 0 && <div className="text-sm text-muted-foreground py-8 text-center">No orders.</div>}
       </div>
       {open && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6 overflow-y-auto" onClick={() => setOpen(null)}>
-          <div onClick={(e) => e.stopPropagation()} className="bg-background border border-border p-8 max-w-2xl w-full space-y-4">
-            <div className="font-display text-3xl">Order {open.id.slice(0, 8).toUpperCase()}</div>
-            <div className="text-xs text-muted-foreground">{new Date(open.created_at).toLocaleString()}</div>
+          <div onClick={(e) => e.stopPropagation()} className="bg-background border border-border p-8 max-w-2xl w-full space-y-4 my-auto">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="font-display text-3xl">Order {open.id.slice(0, 8).toUpperCase()}</div>
+                <div className="text-xs text-muted-foreground mt-1">{new Date(open.created_at).toLocaleString()}</div>
+              </div>
+              <div className={`text-[10px] tracking-[0.3em] uppercase px-3 py-1 border ${open.status === "paid" ? "text-[var(--gold)] border-[var(--gold)]" : open.status === "cancelled" || open.status === "failed" ? "text-destructive border-destructive" : "text-muted-foreground border-border"}`}>
+                {open.status === "paid" ? "Fulfilled" : open.status}
+              </div>
+            </div>
+
             <div className="border-t border-border pt-4">
               <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">Items</div>
               {open.items.map((it, i) => <div key={i} className="text-sm">{it.product_name} · {it.color} · {it.size} × {it.qty}</div>)}
@@ -324,6 +352,38 @@ function OrdersTab() {
               <div><div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Total</div>{formatNaira(open.total_kobo)}</div>
               <div><div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Ref</div><div className="text-xs break-all">{open.paystack_reference ?? "—"}</div></div>
             </div>
+
+            {/* Admin actions */}
+            <div className="border-t border-border pt-6">
+              <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Actions</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setStatus("paid")}
+                  disabled={updating || open.status === "paid"}
+                  className="flex-1 min-w-[140px] bg-[var(--gold)] text-black py-3 text-[10px] tracking-[0.3em] uppercase disabled:opacity-40"
+                >
+                  ✓ Mark Fulfilled
+                </button>
+                <button
+                  onClick={() => setStatus("cancelled")}
+                  disabled={updating || open.status === "cancelled"}
+                  className="flex-1 min-w-[140px] border border-destructive text-destructive py-3 text-[10px] tracking-[0.3em] uppercase hover:bg-destructive hover:text-background transition disabled:opacity-40"
+                >
+                  × Cancel Order
+                </button>
+                {open.status !== "pending" && (
+                  <button
+                    onClick={() => setStatus("pending")}
+                    disabled={updating}
+                    className="flex-1 min-w-[140px] border border-border py-3 text-[10px] tracking-[0.3em] uppercase hover:border-foreground transition disabled:opacity-40"
+                  >
+                    Reset to Pending
+                  </button>
+                )}
+              </div>
+            </div>
+
+            <button onClick={() => setOpen(null)} className="w-full text-[10px] tracking-[0.3em] uppercase text-muted-foreground hover:text-foreground pt-2">Close</button>
           </div>
         </div>
       )}
