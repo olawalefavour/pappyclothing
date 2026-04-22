@@ -12,6 +12,25 @@ export const Route = createFileRoute("/checkout")({
 
 const WHATSAPP_URL = "https://wa.me/message/MXCZONOYQQ5JP1";
 
+async function openWhatsappWithFallback(message: string) {
+  const encodedMessage = encodeURIComponent(message);
+
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(message);
+      toast.success("Order details copied — opening WhatsApp");
+    }
+  } catch {
+    toast.message("WhatsApp opened without auto-fill — copy the order details if needed");
+  }
+
+  window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
+
+  setTimeout(() => {
+    window.location.href = `https://api.whatsapp.com/send?text=${encodedMessage}`;
+  }, 250);
+}
+
 function CheckoutPage() {
   const { items, subtotalKobo, remove, updateQty, count, clear } = useCart();
   const { user, loading: authLoading } = useAuth();
@@ -107,14 +126,12 @@ function CheckoutPage() {
         ...(res.discount_kobo > 0 ? [`Discount: -${fmtNgnKobo(res.discount_kobo)}`] : []),
         `Total: ${fmtNgnKobo(res.total_kobo)}`,
       ];
-      const message = encodeURIComponent(lines.join("\n"));
-      const waUrl = `${WHATSAPP_URL}?text=${message}`;
+      const message = lines.join("\n");
 
       toast.success("Order placed — redirecting to WhatsApp");
       clear();
-      // small delay so toast renders
       setTimeout(() => {
-        window.location.href = waUrl;
+        void openWhatsappWithFallback(message);
       }, 400);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to place order");

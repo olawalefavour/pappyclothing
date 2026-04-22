@@ -105,6 +105,27 @@ export const createPendingOrder = createServerFn({ method: "POST" })
     };
   });
 
+export const deleteProduct = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ product_id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+
+    const { data: roleRow } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (!roleRow) throw new Error("Admin access required");
+
+    const { error } = await supabaseAdmin.from("products").delete().eq("id", data.product_id);
+    if (error) throw new Error(error.message);
+
+    return { success: true };
+  });
+
 /**
  * Admin action: mark order as paid (fulfilled) or cancelled.
  * On "paid", increments referral code usage if applicable.
