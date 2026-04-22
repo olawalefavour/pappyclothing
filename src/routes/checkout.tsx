@@ -3,15 +3,17 @@ import { useState } from "react";
 import { useCart, formatNaira } from "@/lib/cart";
 import { useAuth } from "@/lib/auth-context";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
-import { initializePayment, validateReferralCode } from "@/lib/paystack.functions";
+import { createPendingOrder, validateReferralCode } from "@/lib/paystack.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
+const WHATSAPP_URL = "https://wa.me/message/MXCZONOYQQ5JP1";
+
 function CheckoutPage() {
-  const { items, subtotalKobo, remove, updateQty, count } = useCart();
+  const { items, subtotalKobo, remove, updateQty, count, clear } = useCart();
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -51,7 +53,7 @@ function CheckoutPage() {
     }
   };
 
-  const handlePay = async () => {
+  const handlePlaceOrder = async () => {
     if (!user) {
       navigate({ to: "/auth", search: { redirect: "/checkout" } });
       return;
@@ -62,7 +64,7 @@ function CheckoutPage() {
     }
     setSubmitting(true);
     try {
-      const res = await initializePayment({
+      const res = await createPendingOrder({
         data: {
           items: items.map((i) => ({
             product_id: i.product_id,
@@ -73,12 +75,38 @@ function CheckoutPage() {
           })),
           referral_code: referralInput.trim() || null,
           shipping_address: form,
-          callback_url: `${window.location.origin}/payment/callback`,
         },
       });
-      window.location.href = res.authorization_url;
+
+      // Build a friendly WhatsApp message with order details
+      const orderRef = res.order_id.slice(0, 8).toUpperCase();
+      const lines = [
+        `Hi Pappy Clothings, I'd like to complete payment for my order.`,
+        ``,
+        `Order Ref: ${orderRef}`,
+        `Name: ${form.full_name}`,
+        `Phone: ${form.phone}`,
+        ``,
+        `Items:`,
+        ...items.map((it) => `• ${it.product_name} — ${it.color} / ${it.size} × ${it.qty}`),
+        ``,
+        `Subtotal: ${formatNaira(res.subtotal_kobo)}`,
+        ...(res.discount_kobo > 0 ? [`Discount: -${formatNaira(res.discount_kobo)}`] : []),
+        `Total: ${formatNaira(res.total_kobo)}`,
+        ``,
+        `Shipping to: ${form.address}, ${form.city}, ${form.state}, ${form.country}`,
+      ];
+      const message = encodeURIComponent(lines.join("\n"));
+      const waUrl = `${WHATSAPP_URL}?text=${message}`;
+
+      toast.success("Order placed — redirecting to WhatsApp");
+      clear();
+      // small delay so toast renders
+      setTimeout(() => {
+        window.location.href = waUrl;
+      }, 400);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Payment failed to start");
+      toast.error(e instanceof Error ? e.message : "Failed to place order");
       setSubmitting(false);
     }
   };
@@ -128,6 +156,17 @@ function CheckoutPage() {
                 </div>
                 {discountPct > 0 && <p className="mt-3 text-xs text-[var(--gold)]">✓ {discountPct}% discount applied</p>}
               </Section>
+
+              <Section title="Payment">
+                <div className="border border-border p-6 space-y-3">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    After placing your order, you'll be redirected to WhatsApp to chat with our customer service rep and complete payment securely.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Your order will be marked <span className="text-[var(--gold)]">pending</span> until payment is confirmed.
+                  </p>
+                </div>
+              </Section>
             </div>
 
             {/* Summary */}
@@ -165,13 +204,15 @@ function CheckoutPage() {
               </div>
 
               <button
-                onClick={handlePay}
+                onClick={handlePlaceOrder}
                 disabled={submitting}
                 className="w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition disabled:opacity-50"
               >
-                {submitting ? "Redirecting…" : user ? "Pay with Paystack →" : "Sign in to Pay →"}
+                {submitting ? "Placing order…" : user ? "Place Order & Chat on WhatsApp →" : "Sign in to Continue →"}
               </button>
-              <p className="text-[10px] text-muted-foreground tracking-wider text-center">Secured by Paystack</p>
+              <p className="text-[10px] text-muted-foreground tracking-wider text-center">
+                Payment arranged via WhatsApp with our rep
+              </p>
             </div>
           </div>
         )}
