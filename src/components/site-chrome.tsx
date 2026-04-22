@@ -12,7 +12,7 @@ export function SiteHeader() {
   return (
     <header className="fixed top-0 inset-x-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-16 flex items-center justify-between">
-        <Link to="/" className="font-display text-2xl tracking-tight">PAPPY</Link>
+        <Link to="/" className="font-display text-2xl font-bold tracking-tight uppercase">Pappy Clothings</Link>
 
         <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] uppercase">
           <Link to="/" className="hover:text-[var(--gold)] transition">Home</Link>
@@ -53,7 +53,7 @@ export function SiteFooter() {
     <footer className="border-t border-border mt-32">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-16 grid md:grid-cols-4 gap-12">
         <div>
-          <div className="font-display text-3xl">PAPPY</div>
+          <div className="font-display text-3xl font-bold uppercase">Pappy Clothings</div>
           <p className="mt-4 text-xs text-muted-foreground tracking-wider leading-relaxed">
             Born Above. Limited editions only.
           </p>
@@ -81,7 +81,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border py-6 text-center text-[10px] tracking-[0.3em] uppercase text-muted-foreground">
-        © {new Date().getFullYear()} PAPPY Clothing
+        © {new Date().getFullYear()} Pappy Clothings
       </div>
     </footer>
   );
