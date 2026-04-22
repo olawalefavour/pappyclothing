@@ -41,18 +41,23 @@ function HomePage() {
 
       {/* HERO */}
       <section className="min-h-screen flex flex-col justify-center pt-24 pb-16 px-6 lg:px-12 relative">
-        <div className="max-w-[1600px] mx-auto w-full">
-          <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-8">Chapter 01 — The Debut</div>
-          <h1 className="text-[18vw] md:text-[14vw] leading-[0.85] font-display">
-            Born<br /><span className="italic font-light">Above</span>
-          </h1>
-          <div className="mt-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
-            <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
-              The inaugural drop. A single hoodie. 200 units worldwide. Heavyweight 500gsm fleece, oversized architecture, embroidered crest. For those who arrived already ascended.
-            </p>
-            <Link to="/shop" className="inline-flex items-center gap-3 border border-foreground px-8 py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition self-start md:self-end">
-              Pre-order →
-            </Link>
+        <div className="max-w-[1600px] mx-auto w-full grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-8">Chapter 01 — The Debut</div>
+            <h1 className="text-[18vw] lg:text-[10vw] leading-[0.85] font-display">
+              Born<br /><span className="italic font-light">Above</span>
+            </h1>
+            <div className="mt-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+              <p className="max-w-md text-sm text-muted-foreground leading-relaxed">
+                The inaugural drop. A single hoodie. 200 units worldwide. Heavyweight 500gsm fleece, oversized architecture, embroidered crest. For those who arrived already ascended.
+              </p>
+              <Link to="/shop" className="inline-flex items-center gap-3 border border-foreground px-8 py-4 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition self-start md:self-end whitespace-nowrap">
+                Pre-order →
+              </Link>
+            </div>
+          </div>
+          <div className="aspect-[4/5] bg-[oklch(0.08_0_0)] overflow-hidden order-first lg:order-last">
+            <img src="/assets/pappy-hoodie.png" alt="BORN ABOVE Hoodie by Pappy Clothings" className="w-full h-full object-cover" />
           </div>
         </div>
       </section>
