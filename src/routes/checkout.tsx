@@ -78,23 +78,34 @@ function CheckoutPage() {
         },
       });
 
-      // Build a friendly WhatsApp message with order details
+      // Build a friendly WhatsApp message with full order details
       const orderRef = res.order_id.slice(0, 8).toUpperCase();
+      const fmtNgnKobo = (kobo: number) =>
+        `${formatNaira(kobo)} (${kobo.toLocaleString("en-NG")} kobo)`;
       const lines = [
         `Hi Pappy Clothings, I'd like to complete payment for my order.`,
         ``,
         `Order Ref: ${orderRef}`,
+        ``,
+        `— Customer —`,
         `Name: ${form.full_name}`,
         `Phone: ${form.phone}`,
         ``,
-        `Items:`,
-        ...items.map((it) => `• ${it.product_name} — ${it.color} / ${it.size} × ${it.qty}`),
+        `— Shipping Address —`,
+        `${form.address}`,
+        `${form.city}, ${form.state}`,
+        `${form.country}`,
         ``,
-        `Subtotal: ${formatNaira(res.subtotal_kobo)}`,
-        ...(res.discount_kobo > 0 ? [`Discount: -${formatNaira(res.discount_kobo)}`] : []),
-        `Total: ${formatNaira(res.total_kobo)}`,
+        `— Items —`,
+        ...items.map(
+          (it) =>
+            `• ${it.product_name} — Color: ${it.color}, Size: ${it.size} × ${it.qty} @ ${fmtNgnKobo(it.unit_price_kobo)}`,
+        ),
         ``,
-        `Shipping to: ${form.address}, ${form.city}, ${form.state}, ${form.country}`,
+        `— Totals —`,
+        `Subtotal: ${fmtNgnKobo(res.subtotal_kobo)}`,
+        ...(res.discount_kobo > 0 ? [`Discount: -${fmtNgnKobo(res.discount_kobo)}`] : []),
+        `Total: ${fmtNgnKobo(res.total_kobo)}`,
       ];
       const message = encodeURIComponent(lines.join("\n"));
       const waUrl = `${WHATSAPP_URL}?text=${message}`;
