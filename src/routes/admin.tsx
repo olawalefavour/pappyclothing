@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth-context";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { formatNaira } from "@/lib/cart";
-import { updateOrderStatus } from "@/lib/paystack.functions";
+import { deleteProduct, updateOrderStatus } from "@/lib/paystack.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
@@ -64,15 +64,32 @@ interface Product {
   sizes: string[];
   images: string[];
   active: boolean;
+  archived: boolean;
 }
 
 function ProductsTab() {
   const [products, setProducts] = useState<Product[]>([]);
   const [editing, setEditing] = useState<Product | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const load = () => supabase.from("products").select("*").order("created_at").then(({ data }) => setProducts((data ?? []) as Product[]));
   useEffect(() => { load(); }, []);
+
+  const removeProduct = async (product: Product) => {
+    const confirmed = window.confirm(`Remove ${product.name}? This cannot be undone.`);
+    if (!confirmed) return;
+    setRemovingId(product.id);
+    try {
+      await deleteProduct({ data: { product_id: product.id } });
+      toast.success("Product removed");
+      load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to remove product");
+    } finally {
+      setRemovingId(null);
+    }
+  };
 
   return (
     <div>
@@ -85,8 +102,16 @@ function ProductsTab() {
               <div className="text-xs text-muted-foreground mt-1">{p.colors.join(" · ")}</div>
             </div>
             <div className="font-mono">{formatNaira(p.price_kobo)}</div>
-            <div className={`text-[10px] tracking-[0.3em] uppercase ${p.active ? "text-[var(--gold)]" : "text-muted-foreground"}`}>{p.active ? "Active" : "Hidden"}</div>
-            <button onClick={() => { setEditing(p); setShowForm(true); }} className="text-[10px] tracking-[0.3em] uppercase hover:text-[var(--gold)] text-right">Edit →</button>
+            <div className="space-y-1 text-[10px] tracking-[0.3em] uppercase">
+              <div className={p.active ? "text-[var(--gold)]" : "text-muted-foreground"}>{p.active ? "Live" : "Not live"}</div>
+              {p.archived && <div className="text-muted-foreground">Archive</div>}
+            </div>
+            <div className="flex items-center justify-end gap-4">
+              <button onClick={() => { setEditing(p); setShowForm(true); }} className="text-[10px] tracking-[0.3em] uppercase hover:text-[var(--gold)]">Edit</button>
+              <button onClick={() => void removeProduct(p)} disabled={removingId === p.id} className="text-[10px] tracking-[0.3em] uppercase text-destructive disabled:opacity-40">
+                {removingId === p.id ? "Removing…" : "Remove"}
+              </button>
+            </div>
           </div>
         ))}
       </div>
@@ -103,6 +128,7 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
   const [sizes, setSizes] = useState((product?.sizes ?? ["S", "M", "L", "XL"]).join(", "));
   const [images, setImages] = useState((product?.images ?? []).join(", "));
   const [active, setActive] = useState(product?.active ?? true);
+  const [archived, setArchived] = useState(product?.archived ?? false);
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -115,10 +141,11 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
       sizes: sizes.split(",").map((s) => s.trim()).filter(Boolean),
       images: images.split(",").map((s) => s.trim()).filter(Boolean),
       active,
+      archived,
     };
     const res = product
-      ? await supabase.from("products").update(payload).eq("id", product.id)
-      : await supabase.from("products").insert(payload);
+      ? await supabase.from("products").update(payload as never).eq("id", product.id)
+      : await supabase.from("products").insert(payload as never);
     setSaving(false);
     if (res.error) toast.error(res.error.message);
     else { toast.success("Saved"); onClose(); }
@@ -137,10 +164,16 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
         <Input label="Colors (comma-separated)" value={colors} onChange={setColors} />
         <Input label="Sizes (comma-separated)" value={sizes} onChange={setSizes} />
         <Input label="Image URLs (comma-separated)" value={images} onChange={setImages} />
-        <label className="flex items-center gap-3 text-sm">
-          <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="accent-[var(--gold)]" />
-          Active (visible in shop)
-        </label>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="flex items-center gap-3 text-sm">
+            <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="accent-[var(--gold)]" />
+            Live in shop
+          </label>
+          <label className="flex items-center gap-3 text-sm">
+            <input type="checkbox" checked={archived} onChange={(e) => setArchived(e.target.checked)} className="accent-[var(--gold)]" />
+            Show in archive
+          </label>
+        </div>
         <div className="flex gap-3 pt-4">
           <button onClick={save} disabled={saving} className="flex-1 bg-[var(--gold)] text-black py-3 text-[10px] tracking-[0.3em] uppercase disabled:opacity-50">{saving ? "..." : "Save"}</button>
           <button onClick={onClose} className="flex-1 border border-border py-3 text-[10px] tracking-[0.3em] uppercase">Cancel</button>

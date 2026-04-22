@@ -17,6 +17,7 @@ export function SiteHeader() {
         <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] uppercase">
           <Link to="/" className="hover:text-[var(--gold)] transition">Home</Link>
           <Link to="/shop" className="hover:text-[var(--gold)] transition">Shop</Link>
+          <Link to="/shop" hash="archive" className="hover:text-[var(--gold)] transition">Archive</Link>
           {user && <Link to="/dashboard" className="hover:text-[var(--gold)] transition">Account</Link>}
           {isAdmin && <Link to="/admin" className="text-[var(--gold)] hover:opacity-80 transition">Admin</Link>}
         </nav>
@@ -39,6 +40,7 @@ export function SiteHeader() {
           <nav className="flex flex-col px-6 py-4 gap-4 text-[11px] tracking-[0.25em] uppercase">
             <Link to="/" onClick={() => setOpen(false)}>Home</Link>
             <Link to="/shop" onClick={() => setOpen(false)}>Shop</Link>
+            <Link to="/shop" hash="archive" onClick={() => setOpen(false)}>Archive</Link>
             {user && <Link to="/dashboard" onClick={() => setOpen(false)}>Account</Link>}
             {isAdmin && <Link to="/admin" onClick={() => setOpen(false)} className="text-[var(--gold)]">Admin</Link>}
           </nav>
@@ -62,6 +64,7 @@ export function SiteFooter() {
           <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4">Shop</div>
           <ul className="space-y-2 text-xs">
             <li><Link to="/shop" className="hover:text-[var(--gold)]">Hoodie</Link></li>
+            <li><Link to="/shop" hash="archive" className="hover:text-[var(--gold)]">Archive</Link></li>
             <li><Link to="/checkout" className="hover:text-[var(--gold)]">Checkout</Link></li>
           </ul>
         </div>
