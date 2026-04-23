@@ -99,9 +99,9 @@ function CheckoutPage() {
       const fmtNgnKobo = (kobo: number) =>
         `${formatNaira(kobo)} (${kobo.toLocaleString("en-NG")} kobo)`;
       const lines = [
-        `Hi Pappy Clothings, I'd like to complete payment for my order.`,
+        `*ORDER REF: ${orderRef}*`,
         ``,
-        `Order Ref: ${orderRef}`,
+        `Hi Pappy Clothings, I'd like to complete payment for my order.`,
         ``,
         `— Customer —`,
         `Name: ${form.full_name}`,
