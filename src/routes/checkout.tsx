@@ -179,22 +179,55 @@ function CheckoutPage() {
                 </div>
               </div>
 
-              <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition text-center"
-              >
-                Open WhatsApp →
-              </a>
-              <a
-                href={WHATSAPP_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full text-center border border-foreground py-3 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition"
-              >
-                Open WhatsApp →
-              </a>
+              {(() => {
+                const lines = [
+                  `*New Pre-Order*`,
+                  ``,
+                  `*Items:*`,
+                  ...items.map(
+                    (it) =>
+                      `• ${it.product_name} (${it.color}, ${it.size}) ×${it.qty} — ${formatNaira(it.unit_price_kobo * it.qty)}`,
+                  ),
+                  ``,
+                  `Subtotal: ${formatNaira(subtotalKobo)}`,
+                  ...(discountKobo > 0 ? [`Discount (${discountPct}%): −${formatNaira(discountKobo)}`] : []),
+                  `*Total: ${formatNaira(totalKobo)}*`,
+                  ``,
+                  `*Shipping:*`,
+                  form.full_name && `Name: ${form.full_name}`,
+                  form.phone && `Phone: ${form.phone}`,
+                  form.address && `Address: ${form.address}`,
+                  (form.city || form.state) && `${form.city}${form.city && form.state ? ", " : ""}${form.state}`,
+                  form.country && form.country,
+                ].filter(Boolean);
+                const message = lines.join("\n");
+                const href = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
+                const onClick = () => {
+                  try { void navigator.clipboard.writeText(message); } catch { /* ignore */ }
+                };
+                return (
+                  <>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onClick}
+                      className="block w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition text-center"
+                    >
+                      Pre-Order on WhatsApp →
+                    </a>
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={onClick}
+                      className="block w-full text-center border border-foreground py-3 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition"
+                    >
+                      Open WhatsApp →
+                    </a>
+                  </>
+                );
+              })()}
               <p className="text-[10px] text-muted-foreground tracking-wider text-center">
                 Payment arranged via WhatsApp with our rep
               </p>
