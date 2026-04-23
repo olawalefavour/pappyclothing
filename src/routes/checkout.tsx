@@ -10,10 +10,11 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-const WHATSAPP_URL = "https://wa.me/message/MXCZONOYQQ5JP1";
+const WHATSAPP_PHONE = "2349064677372";
 
 async function openWhatsappWithFallback(message: string) {
   const encodedMessage = encodeURIComponent(message);
+  const whatsappUrl = `https://api.whatsapp.com/send/?phone=${WHATSAPP_PHONE}&text=${encodedMessage}&type=phone_number&app_absent=0`;
 
   try {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
@@ -24,11 +25,7 @@ async function openWhatsappWithFallback(message: string) {
     toast.message("WhatsApp opened without auto-fill — copy the order details if needed");
   }
 
-  window.open(WHATSAPP_URL, "_blank", "noopener,noreferrer");
-
-  setTimeout(() => {
-    window.location.href = `https://api.whatsapp.com/send?text=${encodedMessage}`;
-  }, 250);
+  window.location.assign(whatsappUrl);
 }
 
 function CheckoutPage() {
