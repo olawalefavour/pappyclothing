@@ -232,6 +232,14 @@ function CheckoutPage() {
               >
                 {submitting ? "Placing order…" : user ? "Place Order & Chat on WhatsApp →" : "Sign in to Continue →"}
               </button>
+              <a
+                href={WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full text-center border border-foreground py-3 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition"
+              >
+                Open WhatsApp →
+              </a>
               <p className="text-[10px] text-muted-foreground tracking-wider text-center">
                 Payment arranged via WhatsApp with our rep
               </p>
