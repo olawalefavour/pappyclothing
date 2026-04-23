@@ -12,19 +12,6 @@ export const Route = createFileRoute("/checkout")({
 
 const WHATSAPP_LINK = "https://wa.me/message/MXCZONOYQQ5JP1";
 
-async function openWhatsappWithFallback(message: string) {
-  try {
-    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(message);
-      toast.success("Order details copied — opening WhatsApp");
-    }
-  } catch {
-    toast.message("WhatsApp opened — paste your order details in chat");
-  }
-
-  window.location.assign(WHATSAPP_LINK);
-}
-
 function CheckoutPage() {
   const { items, subtotalKobo, remove, updateQty, count, clear } = useCart();
   const { user, loading: authLoading } = useAuth();
@@ -91,42 +78,9 @@ function CheckoutPage() {
         },
       });
 
-      // Build a friendly WhatsApp message with full order details
-      const orderRef = res.order_id.slice(0, 8).toUpperCase();
-      const fmtNgnKobo = (kobo: number) =>
-        `${formatNaira(kobo)} (${kobo.toLocaleString("en-NG")} kobo)`;
-      const lines = [
-        `*ORDER REF: ${orderRef}*`,
-        ``,
-        `Hi Pappy Clothings, I'd like to complete payment for my order.`,
-        ``,
-        `— Customer —`,
-        `Name: ${form.full_name}`,
-        `Phone: ${form.phone}`,
-        ``,
-        `— Shipping Address —`,
-        `${form.address}`,
-        `${form.city}, ${form.state}`,
-        `${form.country}`,
-        ``,
-        `— Items —`,
-        ...items.map(
-          (it) =>
-            `• ${it.product_name} — Color: ${it.color}, Size: ${it.size} × ${it.qty} @ ${fmtNgnKobo(it.unit_price_kobo)}`,
-        ),
-        ``,
-        `— Totals —`,
-        `Subtotal: ${fmtNgnKobo(res.subtotal_kobo)}`,
-        ...(res.discount_kobo > 0 ? [`Discount: -${fmtNgnKobo(res.discount_kobo)}`] : []),
-        `Total: ${fmtNgnKobo(res.total_kobo)}`,
-      ];
-      const message = lines.join("\n");
-
-      toast.success("Order placed — redirecting to WhatsApp");
+      toast.success("Order placed successfully");
       clear();
-      setTimeout(() => {
-        void openWhatsappWithFallback(message);
-      }, 400);
+      window.open(WHATSAPP_LINK, "_blank", "noopener,noreferrer");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to place order");
       setSubmitting(false);
@@ -225,13 +179,14 @@ function CheckoutPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handlePlaceOrder}
-                disabled={submitting}
-                className="w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition disabled:opacity-50"
+              <a
+                href={WHATSAPP_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition text-center"
               >
-                {submitting ? "Placing order…" : user ? "Place Order & Chat on WhatsApp →" : "Sign in to Continue →"}
-              </button>
+                Open WhatsApp →
+              </a>
               <a
                 href={WHATSAPP_LINK}
                 target="_blank"
