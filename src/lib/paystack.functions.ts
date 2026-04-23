@@ -1,7 +1,19 @@
 import { createServerFn } from "@tanstack/react-start";
+import { createMiddleware } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabase } from "@/integrations/supabase/client";
+
+/**
+ * Client-side middleware that attaches the current Supabase access token
+ * as `Authorization: Bearer <token>` so `requireSupabaseAuth` can validate it.
+ */
+const attachAuthHeader = createMiddleware({ type: "function" }).client(async ({ next }) => {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return next(token ? { headers: { Authorization: `Bearer ${token}` } } : {});
+});
 
 const itemSchema = z.object({
   product_id: z.string().uuid(),
@@ -40,7 +52,7 @@ export const validateReferralCode = createServerFn({ method: "POST" })
  * Admin marks the order paid (fulfilled) or cancelled from /admin.
  */
 export const createPendingOrder = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachAuthHeader, requireSupabaseAuth])
   .inputValidator((d: unknown) => createOrderSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -106,7 +118,7 @@ export const createPendingOrder = createServerFn({ method: "POST" })
   });
 
 export const deleteProduct = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachAuthHeader, requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ product_id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { userId } = context;
@@ -131,7 +143,7 @@ export const deleteProduct = createServerFn({ method: "POST" })
  * On "paid", increments referral code usage if applicable.
  */
 export const updateOrderStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachAuthHeader, requireSupabaseAuth])
   .inputValidator((d: unknown) =>
     z
       .object({
