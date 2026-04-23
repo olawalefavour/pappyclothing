@@ -10,22 +10,19 @@ export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
 
-const WHATSAPP_PHONE = "2349064677372";
+const WHATSAPP_LINK = "https://wa.me/message/MXCZONOYQQ5JP1";
 
 async function openWhatsappWithFallback(message: string) {
-  const encodedMessage = encodeURIComponent(message);
-  const whatsappUrl = `https://api.whatsapp.com/send/?phone=${WHATSAPP_PHONE}&text=${encodedMessage}&type=phone_number&app_absent=0`;
-
   try {
     if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
       await navigator.clipboard.writeText(message);
       toast.success("Order details copied — opening WhatsApp");
     }
   } catch {
-    toast.message("WhatsApp opened without auto-fill — copy the order details if needed");
+    toast.message("WhatsApp opened — paste your order details in chat");
   }
 
-  window.location.assign(whatsappUrl);
+  window.location.assign(WHATSAPP_LINK);
 }
 
 function CheckoutPage() {
