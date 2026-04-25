@@ -162,7 +162,7 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
       price_kobo: Math.round(parseFloat(priceNaira) * 100),
       colors: colors.split(",").map((s) => s.trim()).filter(Boolean),
       sizes: sizes.split(",").map((s) => s.trim()).filter(Boolean),
-      images: images.split(",").map((s) => s.trim()).filter(Boolean),
+      images: imageList,
       active,
       archived,
     };
