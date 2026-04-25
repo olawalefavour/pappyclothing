@@ -186,7 +186,34 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
         <Input label="Price (Naira)" value={priceNaira} onChange={setPriceNaira} type="number" />
         <Input label="Colors (comma-separated)" value={colors} onChange={setColors} />
         <Input label="Sizes (comma-separated)" value={sizes} onChange={setSizes} />
-        <Input label="Image URLs (comma-separated)" value={images} onChange={setImages} />
+        <div>
+          <label className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground block mb-2">Product Images</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={onUpload}
+            disabled={uploading}
+            className="block w-full text-xs file:mr-4 file:py-2 file:px-4 file:border file:border-border file:bg-transparent file:text-foreground file:text-[10px] file:tracking-[0.3em] file:uppercase hover:file:bg-secondary disabled:opacity-50"
+          />
+          {uploading && <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mt-2">Uploading…</div>}
+          {imageList.length > 0 && (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 mt-3">
+              {imageList.map((url, i) => (
+                <div key={`${url}-${i}`} className="relative group border border-border aspect-square overflow-hidden">
+                  <img src={url} alt={`Product ${i + 1}`} className="w-full h-full object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImageList((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="absolute top-1 right-1 bg-black/80 text-white text-[10px] px-2 py-1 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="flex items-center gap-3 text-sm">
             <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} className="accent-[var(--gold)]" />
