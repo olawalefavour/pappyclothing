@@ -126,10 +126,33 @@ function ProductForm({ product, onClose }: { product: Product | null; onClose: (
   const [priceNaira, setPriceNaira] = useState(product ? String(product.price_kobo / 100) : "45000");
   const [colors, setColors] = useState((product?.colors ?? []).join(", "));
   const [sizes, setSizes] = useState((product?.sizes ?? ["S", "M", "L", "XL"]).join(", "));
-  const [images, setImages] = useState((product?.images ?? []).join(", "));
+  const [imageList, setImageList] = useState<string[]>(product?.images ?? []);
   const [active, setActive] = useState(product?.active ?? true);
   const [archived, setArchived] = useState(product?.archived ?? false);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
+    setUploading(true);
+    try {
+      const uploaded: string[] = [];
+      for (const file of files) {
+        const ext = file.name.split(".").pop() ?? "jpg";
+        const path = `${crypto.randomUUID()}.${ext}`;
+        const { error } = await supabase.storage.from("product-images").upload(path, file, { contentType: file.type, upsert: false });
+        if (error) { toast.error(error.message); continue; }
+        const { data } = supabase.storage.from("product-images").getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+      setImageList((prev) => [...prev, ...uploaded]);
+      if (uploaded.length) toast.success(`Uploaded ${uploaded.length} image(s)`);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
 
   const save = async () => {
     setSaving(true);
