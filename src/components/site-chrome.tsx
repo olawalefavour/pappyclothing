@@ -55,7 +55,7 @@ export function SiteFooter() {
     <footer className="border-t border-border mt-32">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-16 grid md:grid-cols-4 gap-12">
         <div>
-          <div className="font-display text-3xl font-bold uppercase">Pappy Clothings</div>
+          <div style={{ fontFamily: "'Pacifico', cursive" }} className="text-4xl font-bold text-[var(--gold)]">Pappy Clothings</div>
           <p className="mt-4 text-xs text-muted-foreground tracking-wider leading-relaxed">
             Born Above. Limited editions only.
           </p>
