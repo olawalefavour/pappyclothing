@@ -12,7 +12,7 @@ export function SiteHeader() {
   return (
     <header className="fixed top-0 inset-x-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 h-16 flex items-center justify-between">
-        <Link to="/" className="font-display text-2xl font-bold tracking-tight uppercase">Pappy Clothings</Link>
+        <Link to="/" style={{ fontFamily: "'Pacifico', cursive" }} className="text-3xl font-bold text-[var(--gold)] tracking-tight normal-case">Pappy Clothings</Link>
 
         <nav className="hidden md:flex items-center gap-10 text-[11px] tracking-[0.25em] uppercase">
           <Link to="/" className="hover:text-[var(--gold)] transition">Home</Link>
@@ -55,7 +55,7 @@ export function SiteFooter() {
     <footer className="border-t border-border mt-32">
       <div className="max-w-[1600px] mx-auto px-6 lg:px-12 py-16 grid md:grid-cols-4 gap-12">
         <div>
-          <div className="font-display text-3xl font-bold uppercase">Pappy Clothings</div>
+          <div style={{ fontFamily: "'Pacifico', cursive" }} className="text-4xl font-bold text-[var(--gold)]">Pappy Clothings</div>
           <p className="mt-4 text-xs text-muted-foreground tracking-wider leading-relaxed">
             Born Above. Limited editions only.
           </p>
