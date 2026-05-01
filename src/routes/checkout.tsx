@@ -4,13 +4,12 @@ import { useCart, formatNaira } from "@/lib/cart";
 import { useAuth } from "@/lib/auth-context";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { createPendingOrder, validateReferralCode } from "@/lib/paystack.functions";
+import { CheckoutChat } from "@/components/checkout-chat";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
-
-const WHATSAPP_LINK = "https://wa.me/message/MXCZONOYQQ5JP1";
 
 function CheckoutPage() {
   const { items, subtotalKobo, remove, updateQty, count, clear } = useCart();
@@ -21,6 +20,9 @@ function CheckoutPage() {
   const [discountPct, setDiscountPct] = useState(0);
   const [validatingRef, setValidatingRef] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [orderContext, setOrderContext] = useState("");
 
   const [form, setForm] = useState({
     full_name: "",
@@ -78,11 +80,28 @@ function CheckoutPage() {
         },
       });
 
-      toast.success("Order placed successfully");
-      clear();
-      window.open(WHATSAPP_LINK, "_blank", "noopener,noreferrer");
+      const ctx = [
+        `Order ID: ${res.order_id}`,
+        `Customer name: ${form.full_name}`,
+        `Phone: ${form.phone}`,
+        `Shipping: ${form.address}, ${form.city}, ${form.state}, ${form.country}`,
+        ``,
+        `Items:`,
+        ...items.map(
+          (it) => `- ${it.product_name} (${it.color}, ${it.size}) ×${it.qty} — ${formatNaira(it.unit_price_kobo * it.qty)}`,
+        ),
+        ``,
+        `Subtotal: ${formatNaira(res.subtotal_kobo)}`,
+        ...(res.discount_kobo > 0 ? [`Discount: -${formatNaira(res.discount_kobo)}`] : []),
+        `TOTAL TO PAY: ${formatNaira(res.total_kobo)}`,
+      ].join("\n");
+
+      setActiveOrderId(res.order_id);
+      setOrderContext(ctx);
+      setChatOpen(true);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to place order");
+    } finally {
       setSubmitting(false);
     }
   };
