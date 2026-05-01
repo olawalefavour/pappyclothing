@@ -15,6 +15,7 @@ import { Route as CheckoutRouteImport } from './routes/checkout'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiCheckoutChatRouteImport } from './routes/api/checkout-chat'
 
 const ShopRoute = ShopRouteImport.update({
   id: '/shop',
@@ -46,6 +47,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiCheckoutChatRoute = ApiCheckoutChatRouteImport.update({
+  id: '/api/checkout-chat',
+  path: '/api/checkout-chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
+  '/api/checkout-chat': typeof ApiCheckoutChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
+  '/api/checkout-chat': typeof ApiCheckoutChatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +79,27 @@ export interface FileRoutesById {
   '/checkout': typeof CheckoutRoute
   '/dashboard': typeof DashboardRoute
   '/shop': typeof ShopRoute
+  '/api/checkout-chat': typeof ApiCheckoutChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/auth' | '/checkout' | '/dashboard' | '/shop'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/checkout'
+    | '/dashboard'
+    | '/shop'
+    | '/api/checkout-chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin' | '/auth' | '/checkout' | '/dashboard' | '/shop'
+  to:
+    | '/'
+    | '/admin'
+    | '/auth'
+    | '/checkout'
+    | '/dashboard'
+    | '/shop'
+    | '/api/checkout-chat'
   id:
     | '__root__'
     | '/'
@@ -85,6 +108,7 @@ export interface FileRouteTypes {
     | '/checkout'
     | '/dashboard'
     | '/shop'
+    | '/api/checkout-chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,6 +118,7 @@ export interface RootRouteChildren {
   CheckoutRoute: typeof CheckoutRoute
   DashboardRoute: typeof DashboardRoute
   ShopRoute: typeof ShopRoute
+  ApiCheckoutChatRoute: typeof ApiCheckoutChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/checkout-chat': {
+      id: '/api/checkout-chat'
+      path: '/api/checkout-chat'
+      fullPath: '/api/checkout-chat'
+      preLoaderRoute: typeof ApiCheckoutChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutRoute: CheckoutRoute,
   DashboardRoute: DashboardRoute,
   ShopRoute: ShopRoute,
+  ApiCheckoutChatRoute: ApiCheckoutChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
