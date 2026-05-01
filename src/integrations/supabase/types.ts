@@ -21,6 +21,7 @@ export type Database = {
           id: string
           items: Json
           paid_at: string | null
+          payment_proof_url: string | null
           paystack_access_code: string | null
           paystack_reference: string | null
           referral_code_id: string | null
@@ -37,6 +38,7 @@ export type Database = {
           id?: string
           items: Json
           paid_at?: string | null
+          payment_proof_url?: string | null
           paystack_access_code?: string | null
           paystack_reference?: string | null
           referral_code_id?: string | null
@@ -53,6 +55,7 @@ export type Database = {
           id?: string
           items?: Json
           paid_at?: string | null
+          payment_proof_url?: string | null
           paystack_access_code?: string | null
           paystack_reference?: string | null
           referral_code_id?: string | null
