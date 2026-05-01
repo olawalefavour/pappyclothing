@@ -213,6 +213,21 @@ function CheckoutPage() {
         )}
       </div>
       <SiteFooter />
+
+      {activeOrderId && (
+        <CheckoutChat
+          open={chatOpen}
+          onClose={() => {
+            setChatOpen(false);
+          }}
+          orderId={activeOrderId}
+          orderContext={orderContext}
+          customerName={form.full_name}
+          onConfirmed={() => {
+            clear();
+          }}
+        />
+      )}
     </div>
   );
 }
