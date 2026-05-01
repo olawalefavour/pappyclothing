@@ -4,13 +4,12 @@ import { useCart, formatNaira } from "@/lib/cart";
 import { useAuth } from "@/lib/auth-context";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 import { createPendingOrder, validateReferralCode } from "@/lib/paystack.functions";
+import { CheckoutChat } from "@/components/checkout-chat";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/checkout")({
   component: CheckoutPage,
 });
-
-const WHATSAPP_LINK = "https://wa.me/message/MXCZONOYQQ5JP1";
 
 function CheckoutPage() {
   const { items, subtotalKobo, remove, updateQty, count, clear } = useCart();
@@ -21,6 +20,9 @@ function CheckoutPage() {
   const [discountPct, setDiscountPct] = useState(0);
   const [validatingRef, setValidatingRef] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [activeOrderId, setActiveOrderId] = useState<string | null>(null);
+  const [orderContext, setOrderContext] = useState("");
 
   const [form, setForm] = useState({
     full_name: "",
@@ -78,11 +80,28 @@ function CheckoutPage() {
         },
       });
 
-      toast.success("Order placed successfully");
-      clear();
-      window.open(WHATSAPP_LINK, "_blank", "noopener,noreferrer");
+      const ctx = [
+        `Order ID: ${res.order_id}`,
+        `Customer name: ${form.full_name}`,
+        `Phone: ${form.phone}`,
+        `Shipping: ${form.address}, ${form.city}, ${form.state}, ${form.country}`,
+        ``,
+        `Items:`,
+        ...items.map(
+          (it) => `- ${it.product_name} (${it.color}, ${it.size}) ×${it.qty} — ${formatNaira(it.unit_price_kobo * it.qty)}`,
+        ),
+        ``,
+        `Subtotal: ${formatNaira(res.subtotal_kobo)}`,
+        ...(res.discount_kobo > 0 ? [`Discount: -${formatNaira(res.discount_kobo)}`] : []),
+        `TOTAL TO PAY: ${formatNaira(res.total_kobo)}`,
+      ].join("\n");
+
+      setActiveOrderId(res.order_id);
+      setOrderContext(ctx);
+      setChatOpen(true);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Failed to place order");
+    } finally {
       setSubmitting(false);
     }
   };
@@ -136,10 +155,10 @@ function CheckoutPage() {
               <Section title="Payment">
                 <div className="border border-border p-6 space-y-3">
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    After placing your order, you'll be redirected to WhatsApp to chat with our customer service rep and complete payment securely.
+                    After placing your order, our AI concierge will guide you through bank transfer payment and confirm your order once you upload your receipt.
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Your order will be marked <span className="text-[var(--gold)]">pending</span> until payment is confirmed.
+                    Your order will be marked <span className="text-[var(--gold)]">pending</span> until payment proof is received.
                   </p>
                 </div>
               </Section>
@@ -179,63 +198,36 @@ function CheckoutPage() {
                 </div>
               </div>
 
-              {(() => {
-                const lines = [
-                  `*New Pre-Order*`,
-                  ``,
-                  `*Items:*`,
-                  ...items.map(
-                    (it) =>
-                      `• ${it.product_name} (${it.color}, ${it.size}) ×${it.qty} — ${formatNaira(it.unit_price_kobo * it.qty)}`,
-                  ),
-                  ``,
-                  `Subtotal: ${formatNaira(subtotalKobo)}`,
-                  ...(discountKobo > 0 ? [`Discount (${discountPct}%): −${formatNaira(discountKobo)}`] : []),
-                  `*Total: ${formatNaira(totalKobo)}*`,
-                  ``,
-                  `*Shipping:*`,
-                  form.full_name && `Name: ${form.full_name}`,
-                  form.phone && `Phone: ${form.phone}`,
-                  form.address && `Address: ${form.address}`,
-                  (form.city || form.state) && `${form.city}${form.city && form.state ? ", " : ""}${form.state}`,
-                  form.country && form.country,
-                ].filter(Boolean);
-                const message = lines.join("\n");
-                const href = `${WHATSAPP_LINK}?text=${encodeURIComponent(message)}`;
-                const onClick = () => {
-                  try { void navigator.clipboard.writeText(message); } catch { /* ignore */ }
-                };
-                return (
-                  <>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={onClick}
-                      className="block w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition text-center"
-                    >
-                      Pre-Order on WhatsApp →
-                    </a>
-                    <a
-                      href={href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={onClick}
-                      className="block w-full text-center border border-foreground py-3 text-[11px] tracking-[0.3em] uppercase hover:bg-foreground hover:text-background transition"
-                    >
-                      Open WhatsApp →
-                    </a>
-                  </>
-                );
-              })()}
+              <button
+                onClick={handlePlaceOrder}
+                disabled={submitting}
+                className="block w-full bg-[var(--gold)] text-black py-4 text-[11px] tracking-[0.3em] uppercase hover:opacity-90 transition text-center disabled:opacity-50"
+              >
+                {submitting ? "Placing order…" : "Checkout →"}
+              </button>
               <p className="text-[10px] text-muted-foreground tracking-wider text-center">
-                Payment arranged via WhatsApp with our rep
+                Pay by bank transfer • AI concierge confirms your order
               </p>
             </div>
           </div>
         )}
       </div>
       <SiteFooter />
+
+      {activeOrderId && (
+        <CheckoutChat
+          open={chatOpen}
+          onClose={() => {
+            setChatOpen(false);
+          }}
+          orderId={activeOrderId}
+          orderContext={orderContext}
+          customerName={form.full_name}
+          onConfirmed={() => {
+            clear();
+          }}
+        />
+      )}
     </div>
   );
 }
