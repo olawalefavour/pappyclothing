@@ -127,38 +127,109 @@ export function CheckoutChat({
     await stream(next);
   };
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp", "image/heic"];
+  const MAX_BYTES = 5 * 1024 * 1024;
+
+  const fileToBase64 = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => {
+        const result = r.result as string;
+        const idx = result.indexOf("base64,");
+        resolve(idx >= 0 ? result.slice(idx + 7) : result);
+      };
+      r.onerror = () => reject(new Error("Could not read file"));
+      r.readAsDataURL(file);
+    });
+
+  const pushAssistant = (content: string) => {
+    setMessages((prev) => [...prev, { role: "assistant", content }]);
+  };
+
   const handleFile = async (file: File) => {
     if (!user) {
-      toast.error("Please sign in");
+      toast.error("Please sign in to upload your receipt.");
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Receipt must be under 5MB");
+    // ── Client-side validation ──────────────────────────────────────────
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error("Receipt must be an image (JPG, PNG, WEBP, or HEIC). PDFs are not supported.");
       return;
     }
+    if (file.size === 0) {
+      toast.error("That file appears to be empty. Please pick another receipt.");
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      toast.error(`Receipt must be under 5 MB (yours is ${(file.size / 1024 / 1024).toFixed(1)} MB).`);
+      return;
+    }
+
     setUploading(true);
     try {
+      // ── 1. AI verification BEFORE anything is saved ───────────────────
+      pushAssistant("🔍 Verifying your receipt, one moment…");
+      const base64 = await fileToBase64(file);
+      const verifyRes = await fetch("/api/verify-receipt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          imageBase64: base64,
+          mimeType: file.type,
+        }),
+      });
+
+      if (!verifyRes.ok) {
+        const err = await verifyRes.json().catch(() => ({}));
+        throw new Error(err.error || "Verification service is unavailable. Please try again.");
+      }
+      const verdict = await verifyRes.json();
+
+      if (!verdict.valid) {
+        const reason =
+          verdict.reason ||
+          "We couldn't confirm this receipt belongs to our Moniepoint account (9064677372 — Ademuwagun Promise Adeyemi).";
+        pushAssistant(
+          `⚠️ ${reason}\n\nPlease upload a clear screenshot of the **Moniepoint transfer receipt** showing the recipient account 9064677372, the amount, the date, and a transaction reference.`,
+        );
+        toast.error("Receipt rejected — please upload the correct one.");
+        return;
+      }
+
+      // ── 2. Upload to private bucket ──────────────────────────────────
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${user.id}/${orderId}-${Date.now()}.${ext}`;
       const { error: upErr } = await supabase.storage
         .from("payment-receipts")
         .upload(path, file, { contentType: file.type });
-      if (upErr) throw upErr;
+      if (upErr) throw new Error(`Could not save receipt: ${upErr.message}`);
 
-      // Save proof reference on the order
-      await attachPaymentProof({ data: { order_id: orderId, proof: path } });
+      // ── 3. Persist proof + transaction id, mark order paid, notify admin ─
+      await attachPaymentProof({
+        data: {
+          order_id: orderId,
+          proof: path,
+          transaction_id: verdict.transactionId || undefined,
+        },
+      });
+
       setConfirmed(true);
       onConfirmed();
 
+      const txnLine = verdict.transactionId
+        ? `Transaction ID: \`${verdict.transactionId}\``
+        : "";
       const userMsg: Msg = {
         role: "user",
-        content: `✅ Uploaded my payment receipt (${file.name}).`,
+        content: `✅ Uploaded my Moniepoint receipt (${file.name}). ${txnLine}`,
       };
       const next = [...messages, userMsg];
       setMessages(next);
       await stream(next);
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
+      const msg = e instanceof Error ? e.message : "Upload failed";
+      pushAssistant(`⚠️ ${msg}`);
+      toast.error(msg);
     } finally {
       setUploading(false);
     }
