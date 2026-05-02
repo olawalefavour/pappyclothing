@@ -295,7 +295,7 @@ export function CheckoutChat({
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*,application/pdf"
+              accept="image/jpeg,image/png,image/webp,image/heic"
               className="hidden"
               onChange={(e) => {
                 const f = e.target.files?.[0];
