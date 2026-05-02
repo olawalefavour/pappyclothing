@@ -131,52 +131,49 @@ async function notifyAdmin(params: {
       <ul>${itemsList || "<li>(no items)</li>"}</ul>
     </div>`.trim();
 
-  // Try sending via Lovable Emails (transactional). If not yet provisioned, log and continue.
-  const baseUrl =
-    process.env.VITE_SUPABASE_URL ??
-    process.env.SITE_URL ??
-    "";
-  // Send via the app's own transactional route. We loop one-by-one (1:1 sends).
+  // Send via the app's own transactional route (Lovable Emails). Skip cleanly if not configured.
+  const appUrl = process.env.PUBLIC_APP_URL || process.env.SITE_URL || "";
+  if (!appUrl) {
+    console.log(
+      `[admin-notify] Lovable Emails not yet configured. Order ${params.orderId} ready. Preview HTML:`,
+      html.slice(0, 400),
+    );
+    return;
+  }
   for (const to of adminEmails) {
     try {
-      const resp = await fetch(
-        `${process.env.PUBLIC_APP_URL ?? ""}/lovable/email/transactional/send`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            templateName: "admin-new-order",
-            recipientEmail: to,
-            idempotencyKey: `admin-order-${params.orderId}`,
-            templateData: {
-              customerName,
-              customerEmail,
-              orderId: params.orderId,
-              transactionId: params.transactionId ?? "(not extracted)",
-              totalNaira,
-              orderedAt,
-              items: items.map((it) => ({
-                name: it.product_name ?? "Item",
-                color: it.color ?? "",
-                size: it.size ?? "",
-                qty: Number(it.qty ?? 1),
-              })),
-            },
-          }),
-        },
-      );
+      const resp = await fetch(`${appUrl}/lovable/email/transactional/send`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          templateName: "admin-new-order",
+          recipientEmail: to,
+          idempotencyKey: `admin-order-${params.orderId}-${to}`,
+          templateData: {
+            customerName,
+            customerEmail,
+            orderId: params.orderId,
+            transactionId: params.transactionId ?? "(not extracted)",
+            totalNaira,
+            orderedAt,
+            items: items.map((it) => ({
+              name: it.product_name ?? "Item",
+              color: it.color ?? "",
+              size: it.size ?? "",
+              qty: Number(it.qty ?? 1),
+            })),
+          },
+        }),
+      });
       if (!resp.ok) {
         console.warn(
-          `Admin email send returned ${resp.status} for ${to} (Lovable Emails may not be set up yet). HTML preview: ${html.slice(0, 200)}…`,
+          `[admin-notify] Send returned ${resp.status} for ${to} — Lovable Emails may not be set up yet.`,
         );
       }
     } catch (e) {
-      console.warn(`Admin email send failed for ${to}:`, e);
+      console.warn(`[admin-notify] Send failed for ${to}:`, e);
     }
   }
-  // suppress unused warning
-  void baseUrl;
-}
 
 function escapeHtml(s: string) {
   return String(s)
