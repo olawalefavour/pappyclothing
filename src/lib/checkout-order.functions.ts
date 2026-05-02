@@ -174,6 +174,7 @@ async function notifyAdmin(params: {
       console.warn(`[admin-notify] Send failed for ${to}:`, e);
     }
   }
+}
 
 function escapeHtml(s: string) {
   return String(s)
