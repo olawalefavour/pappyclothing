@@ -184,6 +184,7 @@ export function CheckoutChat({
         throw new Error(err.error || "Verification service is unavailable. Please try again.");
       }
       const verdict = await verifyRes.json();
+      const verifiedAt = new Date().toISOString();
 
       if (!verdict.valid) {
         const reason =
@@ -199,6 +200,7 @@ export function CheckoutChat({
       // ── 2. Upload to private bucket ──────────────────────────────────
       const ext = file.name.split(".").pop() || "jpg";
       const path = `${user.id}/${orderId}-${Date.now()}.${ext}`;
+      const uploadedAt = new Date().toISOString();
       const { error: upErr } = await supabase.storage
         .from("payment-receipts")
         .upload(path, file, { contentType: file.type });
@@ -210,6 +212,8 @@ export function CheckoutChat({
           order_id: orderId,
           proof: path,
           transaction_id: verdict.transactionId || undefined,
+          uploaded_at: uploadedAt,
+          verified_at: verifiedAt,
         },
       });
 
