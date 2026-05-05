@@ -24,6 +24,8 @@ export type Database = {
           payment_proof_url: string | null
           paystack_access_code: string | null
           paystack_reference: string | null
+          receipt_uploaded_at: string | null
+          receipt_verified_at: string | null
           referral_code_id: string | null
           shipping_address: Json
           status: Database["public"]["Enums"]["order_status"]
@@ -41,6 +43,8 @@ export type Database = {
           payment_proof_url?: string | null
           paystack_access_code?: string | null
           paystack_reference?: string | null
+          receipt_uploaded_at?: string | null
+          receipt_verified_at?: string | null
           referral_code_id?: string | null
           shipping_address: Json
           status?: Database["public"]["Enums"]["order_status"]
@@ -58,6 +62,8 @@ export type Database = {
           payment_proof_url?: string | null
           paystack_access_code?: string | null
           paystack_reference?: string | null
+          receipt_uploaded_at?: string | null
+          receipt_verified_at?: string | null
           referral_code_id?: string | null
           shipping_address?: Json
           status?: Database["public"]["Enums"]["order_status"]
