@@ -66,6 +66,7 @@ function RootComponent() {
     <AuthProvider>
       <CartProvider>
         <Outlet />
+        <WhatsAppFloat />
         <Toaster theme="dark" position="top-center" />
       </CartProvider>
     </AuthProvider>
