@@ -355,9 +355,24 @@ interface AdminOrder {
   total_kobo: number;
   discount_kobo: number;
   created_at: string;
+  updated_at?: string | null;
+  paid_at?: string | null;
+  payment_proof_url?: string | null;
   paystack_reference: string | null;
   shipping_address: { full_name: string; phone: string; address: string; city: string; state: string };
   items: Array<{ product_name: string; color: string; size: string; qty: number }>;
+}
+
+function parseProof(value: string | null | undefined): { path: string | null; txn: string | null } {
+  if (!value) return { path: null, txn: null };
+  const idx = value.indexOf("|TXN:");
+  if (idx === -1) return { path: value, txn: null };
+  return { path: value.slice(0, idx), txn: value.slice(idx + 5) };
+}
+
+function fmt(ts: string | null | undefined) {
+  if (!ts) return null;
+  try { return new Date(ts).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }); } catch { return ts; }
 }
 
 function OrdersTab() {
