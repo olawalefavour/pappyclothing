@@ -357,6 +357,8 @@ interface AdminOrder {
   created_at: string;
   updated_at?: string | null;
   paid_at?: string | null;
+  receipt_uploaded_at?: string | null;
+  receipt_verified_at?: string | null;
   payment_proof_url?: string | null;
   paystack_reference: string | null;
   shipping_address: { full_name: string; phone: string; address: string; city: string; state: string };
