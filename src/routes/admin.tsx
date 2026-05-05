@@ -451,6 +451,38 @@ function OrdersTab() {
               <div><div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground">Ref</div><div className="text-xs break-all">{open.paystack_reference ?? "—"}</div></div>
             </div>
 
+            {/* Order timeline */}
+            {(() => {
+              const { path, txn } = parseProof(open.payment_proof_url);
+              const uploadedAt = open.payment_proof_url ? open.updated_at ?? open.paid_at : null;
+              const events = [
+                { label: "Order placed", at: open.created_at, detail: null as string | null },
+                { label: "Receipt uploaded", at: uploadedAt, detail: path ? path.split("/").pop() ?? null : null },
+                { label: "Receipt verified", at: open.paid_at, detail: txn ? `TXN: ${txn}` : null },
+                { label: "Marked paid", at: open.paid_at, detail: null },
+              ];
+              return (
+                <div className="border-t border-border pt-4">
+                  <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Timeline</div>
+                  <ol className="space-y-3">
+                    {events.map((e, i) => {
+                      const done = !!e.at;
+                      return (
+                        <li key={i} className="flex gap-3 items-start text-sm">
+                          <span className={`mt-1 inline-block w-2 h-2 rounded-full ${done ? "bg-[var(--gold)]" : "bg-border"}`} />
+                          <div className="flex-1">
+                            <div className={done ? "" : "text-muted-foreground"}>{e.label}</div>
+                            {e.detail && <div className="text-xs font-mono text-[var(--gold)] break-all">{e.detail}</div>}
+                          </div>
+                          <div className="text-xs text-muted-foreground whitespace-nowrap">{fmt(e.at) ?? "—"}</div>
+                        </li>
+                      );
+                    })}
+                  </ol>
+                </div>
+              );
+            })()}
+
             {/* Admin actions */}
             <div className="border-t border-border pt-6">
               <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Actions</div>
