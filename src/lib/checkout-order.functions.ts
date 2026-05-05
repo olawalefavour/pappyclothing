@@ -22,6 +22,8 @@ export const attachPaymentProof = createServerFn({ method: "POST" })
         order_id: z.string().uuid(),
         proof: z.string().min(1).max(2000),
         transaction_id: z.string().min(1).max(200).optional(),
+        uploaded_at: z.string().datetime().optional(),
+        verified_at: z.string().datetime().optional(),
       })
       .parse(d),
   )
@@ -40,9 +42,16 @@ export const attachPaymentProof = createServerFn({ method: "POST" })
       ? `${data.proof}|TXN:${data.transaction_id}`
       : data.proof;
 
+    const nowIso = new Date().toISOString();
     const { error: uErr } = await supabaseAdmin
       .from("orders")
-      .update({ payment_proof_url: proofValue, status: "paid", paid_at: new Date().toISOString() })
+      .update({
+        payment_proof_url: proofValue,
+        status: "paid",
+        paid_at: nowIso,
+        receipt_uploaded_at: data.uploaded_at ?? nowIso,
+        receipt_verified_at: data.verified_at ?? nowIso,
+      })
       .eq("id", order.id);
     if (uErr) throw new Error(uErr.message);
 
