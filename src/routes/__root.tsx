@@ -3,6 +3,7 @@ import appCss from "../styles.css?url";
 import { AuthProvider } from "@/lib/auth-context";
 import { CartProvider } from "@/lib/cart";
 import { Toaster } from "sonner";
+import { WhatsAppFloat } from "@/components/site-chrome";
 
 function NotFoundComponent() {
   return (
@@ -65,6 +66,7 @@ function RootComponent() {
     <AuthProvider>
       <CartProvider>
         <Outlet />
+        <WhatsAppFloat />
         <Toaster theme="dark" position="top-center" />
       </CartProvider>
     </AuthProvider>
