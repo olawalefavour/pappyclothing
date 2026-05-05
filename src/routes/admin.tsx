@@ -456,11 +456,12 @@ function OrdersTab() {
             {/* Order timeline */}
             {(() => {
               const { path, txn } = parseProof(open.payment_proof_url);
-              const uploadedAt = open.payment_proof_url ? open.updated_at ?? open.paid_at : null;
+              const uploadedAt = open.receipt_uploaded_at ?? (open.payment_proof_url ? open.updated_at ?? open.paid_at : null);
+              const verifiedAt = open.receipt_verified_at ?? (open.payment_proof_url ? open.paid_at : null);
               const events = [
                 { label: "Order placed", at: open.created_at, detail: null as string | null },
                 { label: "Receipt uploaded", at: uploadedAt, detail: path ? path.split("/").pop() ?? null : null },
-                { label: "Receipt verified", at: open.paid_at, detail: txn ? `TXN: ${txn}` : null },
+                { label: "Receipt verified", at: verifiedAt, detail: txn ? `TXN: ${txn}` : null },
                 { label: "Marked paid", at: open.paid_at, detail: null },
               ];
               return (
