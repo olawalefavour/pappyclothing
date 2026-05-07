@@ -78,10 +78,13 @@ function ShopPage() {
           </section>
         )}
 
-        {product ? (
+        {product ? (() => {
+          const colorIdx = product.colors.indexOf(color);
+          const activeImage = product.images[colorIdx] ?? product.images[0] ?? "/assets/pappy-hoodie.png";
+          return (
           <div className="grid md:grid-cols-2 gap-12 lg:gap-20 py-12">
             <div className="aspect-[4/5] bg-[oklch(0.1_0_0)] overflow-hidden">
-              <img src={product.images[0] ?? "/assets/pappy-hoodie.png"} alt={product.name} className="w-full h-full object-cover" />
+              <img src={activeImage} alt={`${product.name} in ${color}`} className="w-full h-full object-cover" />
             </div>
 
             <div>
@@ -139,7 +142,8 @@ function ShopPage() {
               </div>
             </div>
           </div>
-        ) : (
+          );
+        })() : (
           <section className="py-20 text-center border-b border-border">
             <div className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Shop</div>
             <h1 className="text-4xl md:text-5xl font-display mb-4">No live products right now</h1>
