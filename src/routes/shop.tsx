@@ -142,7 +142,8 @@ function ShopPage() {
               </div>
             </div>
           </div>
-        ) : (
+          );
+        })() : (
           <section className="py-20 text-center border-b border-border">
             <div className="text-[10px] tracking-[0.4em] uppercase text-muted-foreground mb-4">Shop</div>
             <h1 className="text-4xl md:text-5xl font-display mb-4">No live products right now</h1>
