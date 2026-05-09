@@ -13,18 +13,22 @@ function getNextMonday(): Date {
 }
 
 function PreorderCountdown() {
-  const [target] = useState(getNextMonday);
-  const [now, setNow] = useState(() => Date.now());
+  const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState(0);
+  const [target, setTarget] = useState(0);
 
   useEffect(() => {
+    setTarget(getNextMonday().getTime());
+    setNow(Date.now());
+    setMounted(true);
     const id = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, []);
 
-  const diff = Math.max(0, target.getTime() - now);
+  const diff = mounted ? Math.max(0, target - now) : 0;
   const days = Math.floor(diff / 86400000);
   const hours = Math.floor((diff % 86400000) / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
+  const minutes = Math.floor((diff % 3600000) / 60000;
   const seconds = Math.floor((diff % 60000) / 1000);
   const pad = (n: number) => n.toString().padStart(2, "0");
 
@@ -38,7 +42,7 @@ function PreorderCountdown() {
   return (
     <div className="mt-10">
       <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-4">
-        Pre-order closes Monday
+        Pre-order starts Monday
       </div>
       <div className="grid grid-cols-4 gap-3 max-w-md">
         {units.map((u) => (
