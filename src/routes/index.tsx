@@ -2,62 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { SiteHeader, SiteFooter } from "@/components/site-chrome";
 
-function getNextMonday(): Date {
-  const now = new Date();
-  const d = new Date(now);
-  const day = d.getDay(); // 0=Sun..6=Sat
-  const daysUntilMonday = ((1 - day + 7) % 7) || 7; // always upcoming Monday
-  d.setDate(d.getDate() + daysUntilMonday);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function PreorderCountdown() {
-  const [mounted, setMounted] = useState(false);
-  const [now, setNow] = useState(0);
-  const [target, setTarget] = useState(0);
-
-  useEffect(() => {
-    setTarget(getNextMonday().getTime());
-    setNow(Date.now());
-    setMounted(true);
-    const id = setInterval(() => setNow(Date.now()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const diff = mounted ? Math.max(0, target - now) : 0;
-  const days = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const minutes = Math.floor((diff % 3600000) / 60000);
-  const seconds = Math.floor((diff % 60000) / 1000);
-  const pad = (n: number) => n.toString().padStart(2, "0");
-
-  const units = [
-    { label: "Days", value: pad(days) },
-    { label: "Hours", value: pad(hours) },
-    { label: "Minutes", value: pad(minutes) },
-    { label: "Seconds", value: pad(seconds) },
-  ];
-
-  return (
-    <div className="mt-10">
-      <div className="text-[10px] tracking-[0.4em] uppercase text-[var(--gold)] mb-4">
-        Pre-order starts Monday
-      </div>
-      <div className="grid grid-cols-4 gap-3 max-w-md">
-        {units.map((u) => (
-          <div key={u.label} className="border border-border p-3 text-center">
-            <div className="font-mono text-2xl md:text-3xl tabular-nums">{u.value}</div>
-            <div className="text-[9px] tracking-[0.3em] uppercase text-muted-foreground mt-1">
-              {u.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
