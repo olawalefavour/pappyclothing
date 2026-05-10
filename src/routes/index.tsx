@@ -55,7 +55,7 @@ function HomePage() {
                 Pre-order →
               </Link>
             </div>
-            <PreorderCountdown />
+            
           </div>
           <div className="aspect-[4/5] bg-[oklch(0.08_0_0)] overflow-hidden order-first lg:order-last">
             <img src="/assets/pappy-hoodie.png" alt="BORN ABOVE Hoodie by Pappy Clothings" className="w-full h-full object-cover" />
