@@ -34,7 +34,7 @@ function AdminPage() {
         <h1 className="text-5xl md:text-6xl font-display mb-12">Control</h1>
 
         <div className="flex gap-1 mb-12 border-b border-border">
-          {(["products", "referrals", "orders", "users"] as Tab[]).map((t) => (
+          {(["products", "referrals", "orders", "payments", "users"] as Tab[]).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -48,6 +48,7 @@ function AdminPage() {
         {tab === "products" && <ProductsTab />}
         {tab === "referrals" && <ReferralsTab />}
         {tab === "orders" && <OrdersTab />}
+        {tab === "payments" && <PaymentsTab />}
         {tab === "users" && <UsersTab />}
       </div>
       <SiteFooter />
