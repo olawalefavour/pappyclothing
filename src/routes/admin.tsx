@@ -526,6 +526,13 @@ function OrdersTab() {
                     Reset to Pending
                   </button>
                 )}
+                <button
+                  onClick={deleteOrder}
+                  disabled={updating}
+                  className="flex-1 min-w-[140px] border border-destructive bg-destructive text-background py-3 text-[10px] tracking-[0.3em] uppercase disabled:opacity-40"
+                >
+                  🗑 Delete Order
+                </button>
               </div>
             </div>
 
