@@ -373,6 +373,20 @@ function parseProof(value: string | null | undefined): { path: string | null; tx
   return { path: value.slice(0, idx), txn: value.slice(idx + 5) };
 }
 
+function ReceiptPreview({ path, isImage }: { path: string; isImage: boolean }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    supabase.storage.from("payment-receipts").createSignedUrl(path, 600).then(({ data }) => {
+      if (active && data) setUrl(data.signedUrl);
+    });
+    return () => { active = false; };
+  }, [path]);
+  if (!url) return <div className="text-xs text-muted-foreground">Loading receipt…</div>;
+  if (isImage) return <img src={url} alt="Receipt" className="max-h-80 w-full object-contain border border-border bg-secondary" />;
+  return <div className="text-xs text-muted-foreground break-all">{path.split("/").pop()}</div>;
+}
+
 function fmt(ts: string | null | undefined) {
   if (!ts) return null;
   try { return new Date(ts).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }); } catch { return ts; }
