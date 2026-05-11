@@ -407,6 +407,18 @@ function OrdersTab() {
     }
   };
 
+  const deleteOrder = async () => {
+    if (!open) return;
+    if (!window.confirm(`Delete order ${open.id.slice(0, 8).toUpperCase()}? This cannot be undone.`)) return;
+    setUpdating(true);
+    const { error } = await supabase.from("orders").delete().eq("id", open.id);
+    setUpdating(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Order deleted");
+    setOpen(null);
+    load();
+  };
+
   return (
     <div>
       <div className="flex gap-2 mb-6 flex-wrap">
@@ -514,6 +526,13 @@ function OrdersTab() {
                     Reset to Pending
                   </button>
                 )}
+                <button
+                  onClick={deleteOrder}
+                  disabled={updating}
+                  className="flex-1 min-w-[140px] border border-destructive bg-destructive text-background py-3 text-[10px] tracking-[0.3em] uppercase disabled:opacity-40"
+                >
+                  🗑 Delete Order
+                </button>
               </div>
             </div>
 
