@@ -407,6 +407,18 @@ function OrdersTab() {
     }
   };
 
+  const deleteOrder = async () => {
+    if (!open) return;
+    if (!window.confirm(`Delete order ${open.id.slice(0, 8).toUpperCase()}? This cannot be undone.`)) return;
+    setUpdating(true);
+    const { error } = await supabase.from("orders").delete().eq("id", open.id);
+    setUpdating(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Order deleted");
+    setOpen(null);
+    load();
+  };
+
   return (
     <div>
       <div className="flex gap-2 mb-6 flex-wrap">
