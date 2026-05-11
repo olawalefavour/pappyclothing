@@ -373,6 +373,20 @@ function parseProof(value: string | null | undefined): { path: string | null; tx
   return { path: value.slice(0, idx), txn: value.slice(idx + 5) };
 }
 
+function ReceiptPreview({ path, isImage }: { path: string; isImage: boolean }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let active = true;
+    supabase.storage.from("payment-receipts").createSignedUrl(path, 600).then(({ data }) => {
+      if (active && data) setUrl(data.signedUrl);
+    });
+    return () => { active = false; };
+  }, [path]);
+  if (!url) return <div className="text-xs text-muted-foreground">Loading receipt…</div>;
+  if (isImage) return <img src={url} alt="Receipt" className="max-h-80 w-full object-contain border border-border bg-secondary" />;
+  return <div className="text-xs text-muted-foreground break-all">{path.split("/").pop()}</div>;
+}
+
 function fmt(ts: string | null | undefined) {
   if (!ts) return null;
   try { return new Date(ts).toLocaleString("en-NG", { timeZone: "Africa/Lagos" }); } catch { return ts; }
@@ -495,6 +509,30 @@ function OrdersTab() {
                       );
                     })}
                   </ol>
+                </div>
+              );
+            })()}
+
+            {/* Payment receipt */}
+            {(() => {
+              const { path } = parseProof(open.payment_proof_url);
+              if (!path) return null;
+              const isImage = /\.(png|jpe?g|webp|gif)$/i.test(path);
+              const viewReceipt = async () => {
+                const { data, error } = await supabase.storage.from("payment-receipts").createSignedUrl(path, 300);
+                if (error || !data) { toast.error(error?.message ?? "Could not load receipt"); return; }
+                window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+              };
+              return (
+                <div className="border-t border-border pt-4">
+                  <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Payment Receipt</div>
+                  <ReceiptPreview path={path} isImage={isImage} />
+                  <button
+                    onClick={viewReceipt}
+                    className="mt-3 w-full border border-[var(--gold)] text-[var(--gold)] py-2 text-[10px] tracking-[0.3em] uppercase hover:bg-[var(--gold)] hover:text-black transition"
+                  >
+                    Open Receipt in New Tab
+                  </button>
                 </div>
               );
             })()}
