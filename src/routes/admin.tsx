@@ -525,6 +525,111 @@ function OrdersTab() {
   );
 }
 
+interface PaidRow {
+  id: string;
+  user_id: string;
+  total_kobo: number;
+  discount_kobo: number;
+  paid_at: string | null;
+  created_at: string;
+  paystack_reference: string | null;
+  shipping_address: { full_name: string; phone: string };
+  items: Array<{ product_name: string; qty: number }>;
+}
+
+function PaymentsTab() {
+  const [rows, setRows] = useState<PaidRow[]>([]);
+  const [emails, setEmails] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("orders")
+        .select("id, user_id, total_kobo, discount_kobo, paid_at, created_at, paystack_reference, shipping_address, items")
+        .eq("status", "paid")
+        .order("paid_at", { ascending: false });
+      const list = (data ?? []) as unknown as PaidRow[];
+      setRows(list);
+      const ids = [...new Set(list.map((r) => r.user_id))];
+      if (ids.length > 0) {
+        const { data: profs } = await supabase.from("profiles").select("id, full_name, phone").in("id", ids);
+        const map: Record<string, string> = {};
+        (profs ?? []).forEach((p) => { map[p.id] = p.full_name ?? p.phone ?? p.id.slice(0, 8); });
+        setEmails(map);
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const totalRevenue = rows.reduce((sum, r) => sum + r.total_kobo, 0);
+  const totalDiscount = rows.reduce((sum, r) => sum + r.discount_kobo, 0);
+
+  // Aggregate per customer
+  const byCustomer = new Map<string, { name: string; total: number; orders: number }>();
+  rows.forEach((r) => {
+    const name = r.shipping_address?.full_name ?? emails[r.user_id] ?? r.user_id.slice(0, 8);
+    const cur = byCustomer.get(r.user_id) ?? { name, total: 0, orders: 0 };
+    cur.total += r.total_kobo;
+    cur.orders += 1;
+    byCustomer.set(r.user_id, cur);
+  });
+  const customers = [...byCustomer.values()].sort((a, b) => b.total - a.total);
+
+  if (loading) return <div className="text-sm text-muted-foreground py-8 text-center">Loading…</div>;
+
+  return (
+    <div className="space-y-10">
+      <div className="grid sm:grid-cols-3 gap-4">
+        <div className="border border-[var(--gold)] p-6">
+          <div className="text-[10px] tracking-[0.3em] uppercase text-[var(--gold)] mb-2">Total Revenue</div>
+          <div className="font-mono text-3xl">{formatNaira(totalRevenue)}</div>
+        </div>
+        <div className="border border-border p-6">
+          <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">Paid Orders</div>
+          <div className="font-mono text-3xl">{rows.length}</div>
+        </div>
+        <div className="border border-border p-6">
+          <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-2">Total Discounts</div>
+          <div className="font-mono text-3xl">{formatNaira(totalDiscount)}</div>
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4 pb-2 border-b border-border">Top Customers</div>
+        <div className="space-y-2">
+          {customers.map((c, i) => (
+            <div key={i} className="border border-border p-4 grid grid-cols-3 gap-4 items-center text-sm">
+              <div>{c.name}</div>
+              <div className="text-xs text-muted-foreground">{c.orders} order{c.orders > 1 ? "s" : ""}</div>
+              <div className="font-mono text-right text-[var(--gold)]">{formatNaira(c.total)}</div>
+            </div>
+          ))}
+          {customers.length === 0 && <div className="text-sm text-muted-foreground py-8 text-center">No payments yet.</div>}
+        </div>
+      </div>
+
+      <div>
+        <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-4 pb-2 border-b border-border">All Payments</div>
+        <div className="space-y-2">
+          {rows.map((r) => (
+            <div key={r.id} className="border border-border p-4 grid md:grid-cols-5 gap-4 items-center text-sm">
+              <div className="font-mono text-xs">{r.id.slice(0, 8).toUpperCase()}</div>
+              <div>
+                <div>{r.shipping_address?.full_name ?? "—"}</div>
+                <div className="text-xs text-muted-foreground">{r.shipping_address?.phone ?? ""}</div>
+              </div>
+              <div className="text-xs text-muted-foreground">{fmt(r.paid_at) ?? fmt(r.created_at)}</div>
+              <div className="text-xs text-muted-foreground truncate">{r.items.map((it) => `${it.product_name}×${it.qty}`).join(", ")}</div>
+              <div className="font-mono text-right text-[var(--gold)]">{formatNaira(r.total_kobo)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface UserRow {
   id: string;
   full_name: string | null;
