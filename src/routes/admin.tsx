@@ -499,6 +499,30 @@ function OrdersTab() {
               );
             })()}
 
+            {/* Payment receipt */}
+            {(() => {
+              const { path } = parseProof(open.payment_proof_url);
+              if (!path) return null;
+              const isImage = /\.(png|jpe?g|webp|gif)$/i.test(path);
+              const viewReceipt = async () => {
+                const { data, error } = await supabase.storage.from("payment-receipts").createSignedUrl(path, 300);
+                if (error || !data) { toast.error(error?.message ?? "Could not load receipt"); return; }
+                window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+              };
+              return (
+                <div className="border-t border-border pt-4">
+                  <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Payment Receipt</div>
+                  <ReceiptPreview path={path} isImage={isImage} />
+                  <button
+                    onClick={viewReceipt}
+                    className="mt-3 w-full border border-[var(--gold)] text-[var(--gold)] py-2 text-[10px] tracking-[0.3em] uppercase hover:bg-[var(--gold)] hover:text-black transition"
+                  >
+                    Open Receipt in New Tab
+                  </button>
+                </div>
+              );
+            })()}
+
             {/* Admin actions */}
             <div className="border-t border-border pt-6">
               <div className="text-[10px] tracking-[0.3em] uppercase text-muted-foreground mb-3">Actions</div>
